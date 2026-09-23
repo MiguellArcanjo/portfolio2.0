@@ -29,6 +29,7 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
   const deck = useRef<HTMLDivElement>(null);
   const giant = useRef<HTMLDivElement>(null);
   const [seen, setSeen] = useState(false);
+  const [slide, setSlide] = useState(0);
   const words = about.text.split(/\s+/).filter(Boolean);
   const principles = about.principles.filter(item => item.title);
 
@@ -41,16 +42,17 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
     const cards = Array.from(stack.children) as HTMLElement[];
     const pose = { decrypt: 0, front: 0, rx: 0, ry: 0 };
     const pointer = { x: 0, y: 0 };
-    let frame = 0, previous = 0, lastScramble = 0, visible = false, revealStart = 0;
+    let frame = 0, previous = 0, lastScramble = 0, visible = false;
 
     const update = (time: number) => {
       frame = 0;
       const reduced = motion.matches, pinned = desktop.matches && !reduced, vh = innerHeight;
       const rect = rail.getBoundingClientRect();
       const progress = pinned ? clamp(-rect.top / Math.max(1, rect.height - vh)) : 0;
-      // Pinned: scroll drives everything. Otherwise the text decrypts on a timer once visible.
-      if (!pinned && visible && !revealStart) revealStart = time;
-      const decrypt = reduced ? 1 : pinned ? clamp((progress + .08) / .5) : revealStart ? clamp((time - revealStart) / 2200) : 0;
+      // Pinned: the section's scroll progress drives everything. On phones the paragraph decrypts as it
+      // travels up the screen, so the effect still follows the reader's thumb.
+      const textRect = text.getBoundingClientRect();
+      const decrypt = reduced ? 1 : pinned ? clamp((progress + .08) / .5) : clamp((vh * .92 - textRect.top) / (textRect.height + vh * .35));
       const front = reduced || !pinned ? 0 : clamp((progress - .38) / .52) * Math.max(0, cards.length - 1);
       const target = { decrypt, front, rx: pinned ? pointer.y * -10 : 0, ry: pinned ? pointer.x * 14 : 0 };
       const dt = previous ? Math.min((time - previous) / 1000, .05) : 1;
@@ -92,12 +94,31 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
     observer.observe(section);
     spans.forEach(span => { span.dataset.s = scramble(span.textContent ?? ''); });
     const onScroll = () => { if (visible) schedule(); };
+    // Phones: the deck becomes a swipe carousel; each card turns in 3D by its distance from the centre.
+    let swipeFrame = 0;
+    const swipe = () => {
+      swipeFrame = 0;
+      if (desktop.matches && !motion.matches) return;
+      const center = stack.scrollLeft + stack.clientWidth / 2;
+      let nearest = 0, best = Infinity;
+      cards.forEach((card, index) => {
+        const offset = Math.max(-1, Math.min(1, (card.offsetLeft + card.offsetWidth / 2 - center) / card.offsetWidth));
+        card.style.setProperty('--m', offset.toFixed(3)); card.style.setProperty('--am', Math.abs(offset).toFixed(3));
+        if (Math.abs(offset) < best) { best = Math.abs(offset); nearest = index; }
+      });
+      setSlide(nearest);
+    };
+    const onSwipe = () => { if (!swipeFrame) swipeFrame = requestAnimationFrame(swipe); };
+    stack.addEventListener('scroll', onSwipe, { passive: true });
+    window.addEventListener('resize', onSwipe);
+    swipe();
     window.addEventListener('scroll', onScroll, { passive: true }); window.addEventListener('resize', schedule);
     window.addEventListener('pointermove', move, { passive: true });
     motion.addEventListener('change', schedule); desktop.addEventListener('change', schedule);
     schedule();
     return () => {
-      cancelAnimationFrame(frame); observer.disconnect();
+      cancelAnimationFrame(frame); cancelAnimationFrame(swipeFrame); observer.disconnect();
+      stack.removeEventListener('scroll', onSwipe); window.removeEventListener('resize', onSwipe);
       window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', schedule); window.removeEventListener('pointermove', move);
       motion.removeEventListener('change', schedule); desktop.removeEventListener('change', schedule);
     };
@@ -126,6 +147,10 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
                 <div className="deck-card-foot"><i/><span>{index + 1} / {principles.length}</span></div>
               </article>; })}
             </div>
+            {principles.length > 1 && <div className="deck-dots" aria-label={t.personalNotes}>
+              {principles.map((item, index) => <button key={index} aria-label={`${index + 1} / ${principles.length}: ${item.title}`} aria-current={slide === index ? 'true' : undefined} onClick={() => { const card = deck.current?.children[index] as HTMLElement | undefined; deck.current?.scrollTo({ left: (card?.offsetLeft ?? 0) - ((deck.current?.clientWidth ?? 0) - (card?.offsetWidth ?? 0)) / 2, behavior: 'smooth' }); }}><i/></button>)}
+              <span className="deck-hint">{t.swipe}</span>
+            </div>}
           </div>
         </div>
       </div>

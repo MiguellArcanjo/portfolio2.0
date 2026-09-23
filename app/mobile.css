@@ -1,0 +1,81 @@
+/* Touch layouts. The desktop pins scenes to the scroll; on phones each section gets a native gesture
+   instead (swipe carousels, a sticky 3D scene), so counters and "scroll/swipe" hints stay truthful. */
+.tool-mobile-list,.scene-mobile-label,.deck-dots,.xp-hint-mobile { display:none; }
+
+@media (max-width:900px) {
+  /* About: principles as a 3D swipe carousel with position dots. */
+  .portfolio-site .about-stage > * { min-width:0; }
+  .portfolio-site .about-deck-wrap { margin:0 -30px; }
+  .portfolio-site .about-deck { display:flex; gap:14px; height:auto; margin:0; padding:18px 11% 26px; overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scrollbar-width:none; perspective:1000px; transform:none; }
+  .portfolio-site .about-deck::-webkit-scrollbar { display:none; }
+  .portfolio-site .about-deck .deck-card { flex:0 0 78%; min-height:320px; scroll-snap-align:center; transform:rotateY(calc(var(--m,0) * -24deg)) scale(calc(1 - var(--am,0) * .08)) !important; opacity:calc(1 - var(--am,0) * .4) !important; will-change:transform; }
+  .deck-dots { display:flex; align-items:center; gap:4px; padding:0 30px; }
+  .deck-dots button { padding:10px 3px; background:none; border-radius:0; }
+  .deck-dots i { display:block; width:16px; height:2px; background:#4a4d50; transition:width .4s cubic-bezier(.22,1,.36,1),background .4s; }
+  .deck-dots button[aria-current] i { width:36px; background:#eae7df; }
+  .deck-hint { margin-left:auto; font-size:12px; color:#8a8d8f; }
+
+  /* Stack: the 3D scene stays pinned while each area's details scroll underneath. */
+  .portfolio-site #tool-panel { display:none; }
+  .portfolio-site .stack-scene { position:sticky; top:0; z-index:2; height:310px; --size:180px; --gap:46px; background:linear-gradient(#101113 92%,#10111300); }
+  .portfolio-site .stack-scene .stack-world { top:66%; }
+  .portfolio-site .stack-scene .stack-layer.is-above .layer-plate { transform:translateZ(46px); }
+  .portfolio-site .stack-scene .stack-layer.is-active .layer-plate { transform:translateZ(22px); }
+  .scene-mobile-label { display:flex; position:absolute; z-index:3; left:0; right:0; bottom:26px; align-items:center; justify-content:center; gap:9px; font-size:13px; color:#d8d6ce; animation:m-label .5s cubic-bezier(.22,1,.36,1); }
+  .scene-mobile-label svg { color:#a8cde0; }
+  .scene-mobile-label span { font-family:var(--font-plex-mono),monospace; font-size:11px; color:#85888a; }
+  .tool-mobile-list { display:flex; flex-direction:column; padding-bottom:26vh; }
+  .tool-mobile-item { padding:26px 0 30px; border-top:1px solid #2c2e30; opacity:.32; transition:opacity .5s; }
+  .tool-mobile-item.is-active { opacity:1; }
+  .tool-mobile-item .detail-eyebrow { display:none; }
+  .tool-mobile-item h3 { font-family:Georgia,'Times New Roman',serif; font-style:italic; font-weight:400; font-size:30px; letter-spacing:-1px; line-height:1.15; color:#eae7df; }
+  .tool-mobile-item > p { margin-top:12px; font-size:14.5px; line-height:1.7; color:#9a9c9b; }
+  .tool-mobile-item .tool-tiles { grid-template-columns:1fr; margin-top:18px; }
+  .tool-mobile-item .tool-tile { animation:none; opacity:0; transform:translateY(14px); transition:opacity .5s,transform .6s cubic-bezier(.22,1,.36,1); }
+  .tool-mobile-item[data-seen] .tool-tile { opacity:1; transform:none; transition-delay:calc(var(--t) * 80ms); }
+
+  /* Experience: swipe carousel with the same 3D turn, live counter and a synced timeline. */
+  .portfolio-site .xp-meta { display:flex; }
+  .portfolio-site .xp-hint { display:none; }
+  .xp-hint-mobile { display:flex; align-items:center; gap:8px; color:#9a9c9b; font-size:12.5px; }
+  .xp-hint-mobile svg { animation:m-nudge 1.6s ease-in-out infinite; }
+  .portfolio-site .xp-counter { font-size:22px; }
+  .xp-viewport { overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scrollbar-width:none; perspective:1100px; }
+  .xp-viewport::-webkit-scrollbar { display:none; }
+  .portfolio-site .xp-row { display:flex; gap:16px; width:max-content; max-width:none; margin:0; padding:12px calc((100vw - min(84vw,520px)) / 2) 22px; }
+  .portfolio-site .xp-card,.portfolio-site .xp-card[data-seen] { flex:0 0 min(84vw,520px); scroll-snap-align:center; opacity:calc(1 - var(--ad,0) * .4); transform:rotateY(calc(var(--d,0) * -20deg)) scale(calc(1 - var(--ad,0) * .07)); filter:brightness(calc(1 - var(--ad,0) * .25)); transition:none; }
+  .portfolio-site .xp-timeline { display:block; height:62px; margin-top:14px; }
+  .xp-marker { font-size:11px; }
+
+  /* Projects: remove the empty space left by the desktop chapter chrome. */
+  .portfolio-site .story-heading { margin-bottom:22px; }
+  .portfolio-site .chapter-meta { display:none; }
+  .portfolio-site .chapter-pin { padding-top:14px; }
+  .portfolio-site .chapter-layout { padding-top:0; }
+}
+@media (max-width:650px) {
+  .portfolio-site .about-deck-wrap { margin:0 -20px; }
+  .portfolio-site .about-deck { padding-inline:8%; }
+  .portfolio-site .about-deck .deck-card { flex-basis:84%; }
+  .deck-dots { padding:0 20px; }
+  .portfolio-site .stack-scene { height:290px; --size:150px; --gap:40px; }
+  .portfolio-site .stack-scene .stack-world { top:64%; }
+}
+
+/* Scroll-linked entrances on phones (browsers with scroll-driven animations; others simply show content). */
+@supports (animation-timeline: view()) {
+  @media (max-width:900px) and (prefers-reduced-motion:no-preference) {
+    .portfolio-site .chapter-visual { animation:m-unveil linear both; animation-timeline:view(); animation-range:entry 0% cover 38%; }
+    .portfolio-site .chapter-copy > * { animation:m-rise linear both; animation-timeline:view(); animation-range:entry 0% entry 85%; }
+    .portfolio-site :is(.story-heading,.toolkit-heading,.xp-heading) > * { animation:m-rise linear both; animation-timeline:view(); animation-range:entry 0% cover 30%; }
+    .portfolio-site .about-main > :is(.section-label,h2) { animation:m-rise linear both; animation-timeline:view(); animation-range:entry 0% cover 30%; }
+  }
+}
+@keyframes m-unveil { from { clip-path:inset(14% 10% 14% 10%); transform:scale(.94); } to { clip-path:inset(0); transform:none; } }
+@keyframes m-rise { from { opacity:0; transform:translateY(34px); } to { opacity:1; transform:none; } }
+@keyframes m-label { from { opacity:0; transform:translateY(8px); } }
+@keyframes m-nudge { 0%,100% { transform:translateX(0); } 50% { transform:translateX(5px); } }
+@media (prefers-reduced-motion:reduce) {
+  .portfolio-site .about-deck .deck-card,.portfolio-site .xp-card,.portfolio-site .xp-card[data-seen] { transform:none !important; opacity:1 !important; filter:none; }
+  .tool-mobile-item,.tool-mobile-item .tool-tile { opacity:1; transform:none; }
+}

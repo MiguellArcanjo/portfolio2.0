@@ -29,6 +29,7 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
   const world = useRef<HTMLDivElement>(null);
   const heading = useRef<HTMLDivElement>(null);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const list = useRef<HTMLDivElement>(null);
   const current = useRef(0);
   const pinned = useRef(false);
   const count = useRef(areas.length);
@@ -96,8 +97,29 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
     };
   }, [areas.length]);
 
+  // Phones: the 3D scene stays pinned at the top of the section while each area's details scroll beneath it;
+  // whichever area crosses the middle of the screen becomes the active layer.
+  useEffect(() => {
+    const items = Array.from(list.current?.children ?? []) as HTMLElement[];
+    if (!items.length) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting || pinned.current) return;
+      const index = items.indexOf(entry.target as HTMLElement);
+      (entry.target as HTMLElement).dataset.seen = 'true';
+      if (index !== current.current) { current.current = index; setSelected(index); }
+    }), { rootMargin: '-64% 0px -34% 0px' }); // a thin band in the middle of the area left below the pinned scene
+    items.forEach(item => observer.observe(item));
+    return () => observer.disconnect();
+  }, [areas.length]);
+
   const choose = (index: number) => {
     const rail = track.current;
+    const mobileItem = list.current?.children[index] as HTMLElement | undefined;
+    if (!pinned.current && mobileItem && mobileItem.offsetParent) {
+      const scene = mobileItem.parentElement?.parentElement?.querySelector('.stack-scene')?.getBoundingClientRect().height ?? 0;
+      window.scrollTo({ top: scrollY + mobileItem.getBoundingClientRect().top - scene - 8, behavior: 'smooth' });
+      return;
+    }
     if (pinned.current && rail) {
       const rect = rail.getBoundingClientRect();
       window.scrollTo({ top: scrollY + rect.top + (rect.height - innerHeight) * ((index + .12) / areas.length), behavior: 'smooth' });
@@ -128,7 +150,7 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
         </div>
         <div className="toolkit-stage">
           <div className="stack-scene" aria-hidden="true" style={{ '--tool-color': mute(area.color) } as CSSProperties}>
-            
+            <div className="scene-mobile-label" key={area.id}><AreaIcon name={area.icon} size={15}/><b>{area.name}</b><span>{pad(selected + 1)} / {pad(areas.length)}</span></div>
             <div className={`stack-world ${area.icon === 'shield' ? 'is-shielded' : ''}`} ref={world} style={{ '--levels': Math.max(1, areas.length - 1) } as CSSProperties}>
               <span className="stack-floor"/><span className="stack-orbit"/>
               {[0, 1, 2, 3].map(corner => <span key={corner} className={`stack-pillar pillar-${corner}`}/>)}
@@ -151,6 +173,14 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
             <p>{area.description}</p>
             <div className="tool-tiles">{area.tools.map((tool, index) => <div className="tool-tile" key={index} style={{ '--t': index } as CSSProperties} onPointerMove={tilt} onPointerLeave={untilt}><span className="tool-mark">{tool.mark}</span><div><h4>{tool.name}</h4><p>{tool.description}</p></div><span className="tool-tile-number">{pad(index + 1)}</span></div>)}</div>
             {area.code.trim() && <div className="tool-code"><div className="code-bar"><i/><i/><i/><span>{area.file}</span><small>{t.codeSnippet}</small></div><pre aria-label={t.codeExample(area.file)}><code>{area.code.split('\n').map((line, index) => <span key={index} style={{ '--l': index } as CSSProperties}><i>{index + 1}</i>{line}</span>)}</code></pre></div>}
+          </div>
+          <div className="tool-mobile-list" ref={list}>
+            {areas.map((item, index) => <article key={item.id} className={`tool-mobile-item ${selected === index ? 'is-active' : ''}`} style={{ '--c': item.color } as CSSProperties} aria-label={item.name}>
+              <div className="detail-eyebrow"><span className="detail-count">{pad(index + 1)}</span><span>/ {pad(areas.length)} — {item.label.toUpperCase()}</span><AreaIcon name={item.icon} size={17}/></div>
+              <h3>{item.subtitle}</h3>
+              <p>{item.description}</p>
+              <div className="tool-tiles">{item.tools.map((tool, toolIndex) => <div className="tool-tile" key={toolIndex} style={{ '--t': toolIndex } as CSSProperties}><span className="tool-mark">{tool.mark}</span><div><h4>{tool.name}</h4><p>{tool.description}</p></div></div>)}</div>
+            </article>)}
           </div>
         </div>
       </div>

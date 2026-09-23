@@ -59,7 +59,8 @@ function Site({ content }: { content: SiteContent }) {
       if (Math.abs(delta) > 6 || y < 90) last = y;
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    update();
+    // Landing mid-page (a #link or a reload) shows the bar with its backdrop instead of floating over content.
+    bar.dataset.state = scrollY < 90 ? 'top' : 'pinned';
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
   }, []);

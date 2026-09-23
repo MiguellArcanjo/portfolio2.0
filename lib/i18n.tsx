@@ -56,6 +56,9 @@ const pt = {
   current: 'Atual',
   seeMore: 'Ver mais',
   timeline: 'Linha do tempo',
+  swipe: 'Deslize para ver mais',
+  swipeTimeline: 'Deslize para percorrer a trajetória',
+  scrollAreasMobile: 'Role para trocar de área',
 };
 
 export type Dictionary = typeof pt;
@@ -109,6 +112,9 @@ const en: Dictionary = {
   current: 'Current',
   seeMore: 'See more',
   timeline: 'Timeline',
+  swipe: 'Swipe to see more',
+  swipeTimeline: 'Swipe through the journey',
+  scrollAreasMobile: 'Scroll to switch areas',
 };
 
 const es: Dictionary = {
@@ -160,6 +166,9 @@ const es: Dictionary = {
   current: 'Actual',
   seeMore: 'Ver más',
   timeline: 'Línea de tiempo',
+  swipe: 'Desliza para ver más',
+  swipeTimeline: 'Desliza para recorrer la trayectoria',
+  scrollAreasMobile: 'Desplázate para cambiar de área',
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { pt, en, es };

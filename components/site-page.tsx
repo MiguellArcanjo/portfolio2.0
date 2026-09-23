@@ -5,6 +5,7 @@ import { locales, localeLabels, localePath, type Locale } from '@/lib/locales';
 import '@/app/editorial.css';
 import '@/app/portrait-intro.css';
 import '@/app/experience.css';
+import '@/app/mobile.css';
 
 const descriptions: Record<Locale, { title: string; description: string }> = {
   pt: { title: 'Cyber / FullStack — Portfólio', description: 'Desenvolvimento full stack e cibersegurança. Interfaces, sistemas e segurança por design.' },

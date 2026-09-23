@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ArrowDown, ArrowUpRight } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { useI18n } from '@/lib/i18n';
 
@@ -55,15 +55,36 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
         if (index !== current.current) { current.current = index; setActive(index); }
       } else {
         strip.style.removeProperty('transform');
-        cards.forEach(card => { card.style.removeProperty('--d'); card.style.removeProperty('--ad'); });
+        swipe();
       }
       if (moving && visible) schedule();
     };
+    // Phones: the row is a native swipe carousel. The same --d/--ad variables drive the 3D turn,
+    // the counter and the timeline, so the mobile layout keeps what the desktop scroll promises.
+    const scroller = strip.parentElement as HTMLElement;
+    const swipe = () => {
+      if (pinned.current || !cards.length) return;
+      const center = scroller.scrollLeft + scroller.clientWidth / 2;
+      const step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0].offsetWidth;
+      let nearest = 0, best = Infinity;
+      cards.forEach((card, index) => {
+        const distance = clamp((card.offsetLeft + card.offsetWidth / 2 - center) / step, -2, 2);
+        card.style.setProperty('--d', distance.toFixed(3));
+        card.style.setProperty('--ad', Math.abs(distance).toFixed(3));
+        if (Math.abs(distance) < best) { best = Math.abs(distance); nearest = index; }
+      });
+      line.style.setProperty('--fill', clamp(scroller.scrollLeft / Math.max(1, scroller.scrollWidth - scroller.clientWidth)).toFixed(4));
+      if (nearest !== current.current) { current.current = nearest; setActive(nearest); }
+    };
+    let swipeFrame = 0;
+    const onSwipe = () => { if (!swipeFrame) swipeFrame = requestAnimationFrame(() => { swipeFrame = 0; swipe(); }); };
+    scroller.addEventListener('scroll', onSwipe, { passive: true });
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; previous = 0; schedule(); }, { rootMargin: '20% 0px' });
     observer.observe(section);
     // Outside the pinned layout each card simply fades in when it reaches the viewport.
-    const reveal = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('in'); }), { threshold: .2 });
+    // data-seen (not a class) because React rewrites className when the active card changes.
+    const reveal = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) (entry.target as HTMLElement).dataset.seen = 'true'; }), { threshold: .2 });
     cards.forEach(card => reveal.observe(card));
     const onScroll = () => { if (visible) schedule(); };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -71,7 +92,8 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
     motion.addEventListener('change', schedule); desktop.addEventListener('change', schedule);
     schedule();
     return () => {
-      cancelAnimationFrame(frame); observer.disconnect(); reveal.disconnect();
+      cancelAnimationFrame(frame); cancelAnimationFrame(swipeFrame); observer.disconnect(); reveal.disconnect();
+      scroller.removeEventListener('scroll', onSwipe);
       window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', schedule);
       motion.removeEventListener('change', schedule); desktop.removeEventListener('change', schedule);
     };
@@ -79,7 +101,11 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
 
   const go = (index: number) => {
     const rail = track.current;
-    if (!pinned.current || !rail) { document.getElementById(`xp-${items[index]?.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (!pinned.current || !rail) {
+      const card = document.getElementById(`xp-${items[index]?.id}`), scroller = row.current?.parentElement;
+      if (card && scroller) scroller.scrollTo({ left: card.offsetLeft - (scroller.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' });
+      return;
+    }
     const rect = rail.getBoundingClientRect();
     window.scrollTo({ top: scrollY + rect.top + (rect.height - innerHeight) * (items.length > 1 ? index / (items.length - 1) : 0), behavior: 'smooth' });
   };
@@ -94,7 +120,7 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
     </div>
     <div className="xp-track" ref={track}>
       <div className="xp-pin">
-        <div className="container xp-meta"><span className="xp-hint"><ArrowDown size={14}/> {t.scrollTimeline}</span><span className="xp-counter">{pad(active + 1)} <i>/ {pad(items.length)}</i></span></div>
+        <div className="container xp-meta"><span className="xp-hint"><ArrowDown size={14}/> {t.scrollTimeline}</span><span className="xp-hint-mobile"><ArrowRight size={14}/> {t.swipeTimeline}</span><span className="xp-counter">{pad(active + 1)} <i>/ {pad(items.length)}</i></span></div>
         <div className="xp-viewport">
           <div className="xp-row" ref={row}>
             {items.map((item, index) => <article key={item.id} id={`xp-${item.id}`} className={`xp-card ${index === active ? 'is-active' : ''}`} style={{ '--i': index } as CSSProperties} onClick={() => index !== active && go(index)} aria-labelledby={`xp-role-${item.id}`}>
