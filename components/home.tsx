@@ -11,6 +11,7 @@ import { ProjectShowcase } from '@/components/project-showcase';
 import type { Project, SiteContent } from '@/lib/content';
 import { PortraitIntro } from '@/components/portrait-intro';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
+import { LOCALE_COOKIE } from '@/lib/locale-detect';
 
 const lines = (text: string) => text.split('\n').map((line, index) => <Fragment key={index}>{index > 0 && <br/>}{line}</Fragment>);
 
@@ -23,7 +24,12 @@ function LanguageSwitch({ className = '' }: { className?: string }) {
   const { locale, t } = useI18n();
   return <nav className={`lang-switch ${className}`} aria-label={t.language}>
     {locales.map(code => <a key={code} href={localePath(code)} hrefLang={localeLabels[code].html} lang={localeLabels[code].html} aria-current={code === locale ? 'true' : undefined} title={localeLabels[code].name}
-      onClick={event => { if (code === locale) { event.preventDefault(); return; } event.preventDefault(); location.assign(localePath(code) + location.hash); }}>{localeLabels[code].short}</a>)}
+      onClick={event => {
+        event.preventDefault();
+        // An explicit choice overrides the country/browser detection done by proxy.ts on later visits.
+        document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`;
+        if (code !== locale) location.assign(localePath(code) + location.hash);
+      }}>{localeLabels[code].short}</a>)}
   </nav>;
 }
 
