@@ -1,10 +1,10 @@
 // Keeps card text from being clipped: a card whose content overflows its height first switches to a
 // denser layout (data-fit="dense") and, only if it still overflows, becomes scrollable (data-fit="scroll").
 
-// Only in-flow content counts: decorative absolutely-positioned pieces (like the big background number)
+// Only visible in-flow content counts: decorative absolutely-positioned pieces (like the big background number)
 // deliberately bleed past the card edge and must not trigger the dense layout.
 function overflows(card: HTMLElement) {
-  const content = Array.from(card.children).filter(child => getComputedStyle(child).position !== 'absolute') as HTMLElement[];
+  const content = (Array.from(card.children) as HTMLElement[]).filter(child => child.offsetParent !== null && getComputedStyle(child).position !== 'absolute');
   const last = content[content.length - 1];
   if (!last) return false;
   const bottom = last.offsetTop + last.offsetHeight;

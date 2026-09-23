@@ -169,3 +169,29 @@
 .portfolio-site .deck-card[data-fit] .deck-card-foot { margin-top:16px; }
 .portfolio-site .deck-card[data-fit] .deck-number { display:none; }
 .portfolio-site .deck-card[data-fit='scroll'] { overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+
+/* Pinned scenes make room for the header when it slides back in on scroll-up, instead of sitting under it.
+   Only padding inside the pinned box changes, so the page length and scroll position stay the same. */
+.portfolio-site { --header-space:0px; }
+.portfolio-site:has(.header[data-state='pinned']) { --header-space:90px; }
+@media(max-width:650px) { .portfolio-site:has(.header[data-state='pinned']) { --header-space:76px; } }
+@media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
+ .portfolio-site .toolkit-pin { padding-top:calc(34px + var(--header-space)); transition:padding-top .45s cubic-bezier(.22,1,.36,1); }
+ .portfolio-site .about-pin,.portfolio-site .xp-pin { padding-top:var(--header-space); transition:padding-top .45s cubic-bezier(.22,1,.36,1); }
+ .portfolio-site .chapter-pin { padding-top:calc(25px + var(--header-space)); transition:padding-top .45s cubic-bezier(.22,1,.36,1); }
+}
+
+/* Stack detail with many tools: bounded by the pinned stage, denser when needed (lib/fit.ts). */
+@media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
+ .portfolio-site .toolkit-stage { min-height:0; }
+ .portfolio-site .toolkit-detail { position:relative; max-height:100%; overflow:hidden; }
+}
+.portfolio-site .toolkit-detail[data-fit] h3 { font-size:30px; }
+.portfolio-site .toolkit-detail[data-fit] > p { margin-top:8px; font-size:13.5px; line-height:1.6; }
+.portfolio-site .toolkit-detail[data-fit] .tool-tiles { margin-top:14px; gap:6px 10px; }
+.portfolio-site .toolkit-detail[data-fit] .tool-tile { padding:8px 10px; gap:10px; }
+.portfolio-site .toolkit-detail[data-fit] .tool-mark { width:28px; height:28px; font-size:10.5px; }
+.portfolio-site .toolkit-detail[data-fit] .tool-tile h4 { margin-bottom:2px; font-size:12.5px; }
+.portfolio-site .toolkit-detail[data-fit] .tool-tile p { font-size:10.5px; }
+.portfolio-site .toolkit-detail[data-fit] .tool-code { display:none; }
+.portfolio-site .toolkit-detail[data-fit='scroll'] { overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; padding-right:10px; }

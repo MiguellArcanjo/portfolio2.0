@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Manrope, IBM_Plex_Mono } from 'next/font/google';
+import { siteUrl } from '@/lib/site-url';
 import './globals.css';
 
 // Self-hosted and preloaded by next/font: no render-blocking request to Google Fonts.
@@ -8,6 +9,7 @@ const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', displa
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono', display: 'swap' });
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl,
   title: 'Cyber / FullStack — Portfólio',
   description: 'Desenvolvimento full stack e cibersegurança. Interfaces, sistemas e segurança por design.',
 };

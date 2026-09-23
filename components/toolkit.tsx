@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties, type Pointer
 import { ArrowDown, Terminal, LockKeyhole } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { AreaIcon } from './area-icon';
+import { watchFit } from '@/lib/fit';
 import { useI18n } from '@/lib/i18n';
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
@@ -112,6 +113,9 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
     return () => observer.disconnect();
   }, [areas.length]);
 
+  // Areas with many tools must not run past the bottom of the pinned screen.
+  useEffect(() => { const panel = document.getElementById('tool-panel'); return panel ? watchFit([panel]) : undefined; }, [area?.id, content]);
+
   const choose = (index: number) => {
     const rail = track.current;
     const mobileItem = list.current?.children[index] as HTMLElement | undefined;
@@ -169,10 +173,10 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
           </div>
           <div id="tool-panel" role="tabpanel" aria-labelledby={`tool-tab-${selected}`} tabIndex={0} className="toolkit-detail" key={area.id}>
             <div className="detail-eyebrow"><span className="detail-count">{pad(selected + 1)}</span><span>/ {pad(areas.length)} — {area.label.toUpperCase()}</span><AreaIcon name={area.icon} size={19}/></div>
-            <h3 aria-label={area.subtitle}>{area.subtitle.split(' ').map((word, index) => <span key={index} aria-hidden="true" style={{ '--w': index } as CSSProperties}>{word}</span>)}</h3>
+            <h3><span className="sr-only">{area.subtitle}</span>{area.subtitle.split(' ').map((word, index) => <span key={index} aria-hidden="true" style={{ '--w': index } as CSSProperties}>{word}</span>)}</h3>
             <p>{area.description}</p>
             <div className="tool-tiles">{area.tools.map((tool, index) => <div className="tool-tile" key={index} style={{ '--t': index } as CSSProperties} onPointerMove={tilt} onPointerLeave={untilt}><span className="tool-mark">{tool.mark}</span><div><h4>{tool.name}</h4><p>{tool.description}</p></div><span className="tool-tile-number">{pad(index + 1)}</span></div>)}</div>
-            {area.code.trim() && <div className="tool-code"><div className="code-bar"><i/><i/><i/><span>{area.file}</span><small>{t.codeSnippet}</small></div><pre aria-label={t.codeExample(area.file)}><code>{area.code.split('\n').map((line, index) => <span key={index} style={{ '--l': index } as CSSProperties}><i>{index + 1}</i>{line}</span>)}</code></pre></div>}
+            {area.code.trim() && <div className="tool-code"><div className="code-bar"><i/><i/><i/><span>{area.file}</span><small>{t.codeSnippet}</small></div><pre><code>{area.code.split('\n').map((line, index) => <span key={index} style={{ '--l': index } as CSSProperties}><i>{index + 1}</i>{line}</span>)}</code></pre></div>}
           </div>
           <div className="tool-mobile-list" ref={list}>
             {areas.map((item, index) => <article key={item.id} className={`tool-mobile-item ${selected === index ? 'is-active' : ''}`} style={{ '--c': item.color } as CSSProperties} aria-label={item.name}>

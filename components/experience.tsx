@@ -143,7 +143,7 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
           </div>
         </div>
         <div className="container">
-          <div className="xp-timeline" ref={timeline} aria-label={t.timeline}>
+          <div className="xp-timeline" ref={timeline} role="group" aria-label={t.timeline}>
             <span className="xp-line"><i/></span>
             {items.map((item, index) => <button key={item.id} className={`xp-marker ${index <= active ? 'is-passed' : ''} ${index === active ? 'is-active' : ''}`} style={{ '--x': items.length > 1 ? index / (items.length - 1) : 0 } as CSSProperties} onClick={() => go(index)} aria-label={`${item.role}, ${item.period}`} aria-current={index === active ? 'step' : undefined}><i/><span>{item.period}</span></button>)}
           </div>

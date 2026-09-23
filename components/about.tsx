@@ -136,7 +136,8 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
             <div className="section-label"><span>01 /</span> {t.labels.about}</div>
             <h2>{about.title}<br/><span>{about.accent}</span></h2>
             <p className="about-hello">{about.intro} <strong>{profile.name}</strong></p>
-            <p className="about-cipher" ref={copy} aria-label={about.text}>{words.map((word, index) => <span key={index} aria-hidden="true" data-state="idle">{word}</span>)}</p>
+            <p className="sr-only">{about.text}</p>
+            <p className="about-cipher" ref={copy} aria-hidden="true">{words.map((word, index) => <span key={index} aria-hidden="true" data-state="idle">{word}</span>)}</p>
             <div className="about-traits">{about.traits.filter(Boolean).map((trait, index) => { const Icon = traitIcons[index % traitIcons.length]; return <span key={index} style={{ '--d': index } as CSSProperties} className={seen ? 'in' : ''}><Icon size={15}/>{trait}</span>; })}</div>
           </div>
           <div className="about-deck-wrap">
@@ -150,7 +151,7 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
                 <div className="deck-card-foot"><i/><span>{index + 1} / {principles.length}</span></div>
               </article>; })}
             </div>
-            {principles.length > 1 && <div className="deck-dots" aria-label={t.personalNotes}>
+            {principles.length > 1 && <div className="deck-dots" role="group" aria-label={t.personalNotes}>
               {principles.map((item, index) => <button key={index} aria-label={`${index + 1} / ${principles.length}: ${item.title}`} aria-current={slide === index ? 'true' : undefined} onClick={() => { const card = deck.current?.children[index] as HTMLElement | undefined; deck.current?.scrollTo({ left: (card?.offsetLeft ?? 0) - ((deck.current?.clientWidth ?? 0) - (card?.offsetWidth ?? 0)) / 2, behavior: 'smooth' }); }}><i/></button>)}
               <span className="deck-hint">{t.swipe}</span>
             </div>}

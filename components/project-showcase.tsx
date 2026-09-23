@@ -74,7 +74,7 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
   return <section id="projetos" className="projects-story" ref={root}>
     <div className="container section-heading story-heading">
       <div><div className="section-label"><span>02 /</span> {t.labels.projects}</div><h2>{heading.title} <span>{heading.accent}</span></h2></div>
-      <div className="filters" aria-label={t.filterProjects}>
+      <div className="filters" role="group" aria-label={t.filterProjects}>
         {categories.map(value => <button key={value} aria-pressed={filter === value} className={filter === value ? 'active' : ''} onClick={() => setFilter(value)}>{value === ALL ? t.all : value}{value === ALL && <span>{String(projects.length).padStart(2, '0')}</span>}</button>)}
       </div>
     </div>
@@ -87,7 +87,7 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
             <div className="chapter-copy">
               <span className="chapter-category">{project.category}</span>
               <h3 id={`title-${project.id}`}>{project.title}<span>.</span></h3>
-              <div className="chapter-steps" aria-label={t.projectStages(project.title)}>
+              <div className="chapter-steps" role="group" aria-label={t.projectStages(project.title)}>
                 {t.stages.map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}</button>)}
               </div>
               <div className="chapter-phases">

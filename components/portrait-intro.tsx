@@ -48,7 +48,7 @@ export function PortraitIntro({ profile }: { profile: SiteContent['profile'] }) 
       <div className="portrait-frame">
         {!failed && profile.photo ? <img src={profile.photo} alt={profile.photoAlt} fetchPriority="high" decoding="async" onError={() => setFailed(true)} style={{ objectPosition: profile.photoPosition || '50% 50%' }}/> : <div className="portrait-fallback" role="img" aria-label={t.portraitPlaceholder}><span>{profile.initials}</span></div>}
       </div>
-      <div className="portrait-type"><p className="portrait-name" aria-label={profile.name}>{name.map((line, index) => <span key={index} aria-hidden="true">{line}</span>)}</p></div>
+      <div className="portrait-type"><p className="sr-only">{profile.name}</p><p className="portrait-name" aria-hidden="true">{name.map((line, index) => <span key={index} aria-hidden="true">{line}</span>)}</p></div>
       <a className="portrait-continue" href="#inicio" aria-label={t.continue}><ArrowDown size={22}/></a>
     </div>
   </section>;

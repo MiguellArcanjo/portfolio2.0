@@ -20,9 +20,9 @@ export function Home({ content, locale }: { content: SiteContent; locale: Locale
 }
 
 // Keeps the reader on the same section when switching language.
-function LanguageSwitch({ className = '' }: { className?: string }) {
+function LanguageSwitch({ className = '', label }: { className?: string; label?: string }) {
   const { locale, t } = useI18n();
-  return <nav className={`lang-switch ${className}`} aria-label={t.language}>
+  return <nav className={`lang-switch ${className}`} aria-label={label ?? t.language}>
     {locales.map(code => <a key={code} href={localePath(code)} hrefLang={localeLabels[code].html} lang={localeLabels[code].html} aria-current={code === locale ? 'true' : undefined} title={localeLabels[code].name}
       onClick={event => {
         event.preventDefault();
@@ -104,7 +104,7 @@ function Site({ content }: { content: SiteContent }) {
       <Experience content={content.experience}/>
       <section id="contato" className="contact-section reveal"><div className="container"><div className="section-label"><span>04 /</span> {t.labels.contact}</div><div className="contact-layout"><h2>{lines(content.contact.title)} <span>{content.contact.accent}</span></h2><a className="contact-arrow" href={profile.email?`mailto:${profile.email}`:'#contact-details'} aria-label={t.seeContact}><ArrowUpRight/></a></div><div className="contact-bottom" id="contact-details"><p>{lines(content.contact.text)}</p>{profile.email?<div className="email-group"><a href={`mailto:${profile.email}`}>{profile.email}</a><button onClick={copyEmail} aria-label={t.copyEmail}>{copied?<Check size={18}/>:<Copy size={18}/>}</button><span role="status">{copied?t.copied:copyError?t.copyFallback:''}</span></div>:<div className="contact-placeholder"><Mail size={19}/><span>{t.emailPlaceholder}<small>{t.emailPending}</small></span></div>}</div></div></section>
     </main>
-    <footer className="container footer"><a href="#" className="logo">{profile.initials}<span>.</span></a><span>{t.footer}</span><LanguageSwitch className="in-footer"/><div className="socials">{profile.github&&<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Github size={18}/></a>}{profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Linkedin size={18}/></a>}<a href="#" aria-label={t.backToTop}>{t.backToTop} <ArrowUpRight size={15}/></a></div></footer>
+    <footer className="container footer"><a href="#" className="logo">{profile.initials}<span>.</span></a><span>{t.footer}</span><LanguageSwitch className="in-footer" label={t.languageFooter}/><div className="socials">{profile.github&&<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Github size={18}/></a>}{profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Linkedin size={18}/></a>}<a href="#" aria-label={t.backToTop}>{t.backToTop} <ArrowUpRight size={15}/></a></div></footer>
     <dialog ref={dialog} className="project-dialog" onCancel={()=>setSelected(null)} onClick={e=>{if(e.target===e.currentTarget)setSelected(null);}} aria-labelledby="dialog-title"><button className="dialog-close" onClick={()=>setSelected(null)} aria-label={t.closeDetails}><X size={22}/></button>{selected&&<><ProjectPreview kind={selected.kind} image={selected.image} alt={t.coverOf(selected.title)} placeholder={selected.description.startsWith('[')}/><div className="dialog-content"><div className="section-label">{t.project.toUpperCase()} / {selected.type}</div><h2 id="dialog-title">{selected.title}</h2><p>{selected.description}</p><p>{selected.detail}</p><div className="tags">{selected.tags.map(tag=><span key={tag}>{tag}</span>)}</div>{selected.github&&<a href={selected.github}>{t.seeRepository} <ArrowUpRight size={16}/></a>}{selected.live&&<a href={selected.live}>{t.openProject} <ArrowUpRight size={16}/></a>}</div></>}</dialog>
   </div>;
 }
