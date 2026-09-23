@@ -9,7 +9,7 @@ export async function getPublishedContent(): Promise<SiteContent> {
   try {
     const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
-    if (error) { console.error('[content] leitura do Supabase falhou:', error.message); return defaultContent; }
+    if (error) { console.error('[content] leitura do Supabase falhou:', error.message, error.details ? `\n${error.details}` : ''); return defaultContent; }
     return data ? mergeContent(data.content) : defaultContent;
   } catch (error) {
     console.error('[content] Supabase indisponível:', error);
