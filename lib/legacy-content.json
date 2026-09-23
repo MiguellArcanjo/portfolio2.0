@@ -1,0 +1,253 @@
+{
+  "profile": {
+    "name": "Seu nome",
+    "initials": "dev",
+    "role": "Cybersecurity & Full Stack Developer",
+    "status": "Disponível para novos projetos",
+    "email": "",
+    "github": "",
+    "linkedin": ""
+  },
+  "hero": {
+    "title": "Construindo\nexperiências.",
+    "accent": "Protegendo\npossibilidades.",
+    "text": "Código com propósito. Segurança por princípio.\nTransformo ideias em experiências digitais que funcionam — e resistem."
+  },
+  "strip": {
+    "label": "Tecnologia encontra intenção",
+    "items": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Python",
+      "Linux",
+      "Docker",
+      "PostgreSQL",
+      "Node.js"
+    ]
+  },
+  "about": {
+    "title": "Curiosidade como motor.",
+    "accent": "Código como expressão.",
+    "intro": "Olá, eu sou",
+    "text": "Entre o desenvolvimento e a segurança, encontro meu jeito de resolver problemas. Meu foco é construir experiências intuitivas, entender o que acontece por trás delas e pensar na proteção desde a primeira linha de código.",
+    "traits": [
+      "Builder por natureza.",
+      "Security por escolha."
+    ],
+    "marquee": "Curiosidade — Código — Segurança —",
+    "principles": [
+      {
+        "title": "Entender antes de construir",
+        "text": "Cada solução começa pelo problema: quem usa, o que importa e onde estão os riscos."
+      },
+      {
+        "title": "Construir com intenção",
+        "text": "Código legível, interfaces claras e decisões que fazem sentido daqui a seis meses."
+      },
+      {
+        "title": "Proteger desde o início",
+        "text": "Segurança não é etapa final — é um critério presente em cada camada do projeto."
+      }
+    ]
+  },
+  "projectsSection": {
+    "title": "Ideias que viraram",
+    "accent": "código."
+  },
+  "projects": [
+    {
+      "id": "sentinel",
+      "title": "Sentinel",
+      "type": "CYBERSECURITY",
+      "category": "Cyber",
+      "description": "Conceito de painel para centralizar eventos de segurança e transformar sinais em informações acionáveis.",
+      "tags": [
+        "Python",
+        "FastAPI",
+        "React"
+      ],
+      "kind": "security",
+      "github": "",
+      "live": "",
+      "detail": "Projeto demonstrativo para apresentar a direção visual do portfólio. Substitua pelo seu trabalho real, incluindo contexto, seu papel, tecnologias e resultados verificáveis."
+    },
+    {
+      "id": "nexus",
+      "title": "Nexus",
+      "type": "FULL STACK APPLICATION",
+      "category": "FullStack",
+      "description": "Conceito de workspace que conecta projetos, tarefas e pessoas em uma experiência fluida.",
+      "tags": [
+        "Next.js",
+        "TypeScript",
+        "PostgreSQL"
+      ],
+      "kind": "workspace",
+      "github": "",
+      "live": "",
+      "detail": "Projeto demonstrativo. Use este espaço para explicar um produto que você construiu, as decisões de arquitetura e os desafios que resolveu."
+    },
+    {
+      "id": "packet-lab",
+      "title": "Packet Lab",
+      "type": "SECURITY RESEARCH",
+      "category": "Cyber",
+      "description": "Conceito de laboratório para explorar redes, analisar tráfego e documentar descobertas.",
+      "tags": [
+        "Python",
+        "Linux",
+        "Docker"
+      ],
+      "kind": "terminal",
+      "github": "",
+      "live": "",
+      "detail": "Projeto demonstrativo. Substitua por um laboratório autorizado, estudo ou ferramenta de sua autoria, com links para a documentação e o repositório."
+    }
+  ],
+  "toolkit": {
+    "title": "Não são só ferramentas.",
+    "accent": "É como tudo se conecta.",
+    "text": "Da experiência à infraestrutura,\ncom segurança em cada camada.",
+    "areas": [
+      {
+        "id": "frontend",
+        "name": "Frontend",
+        "label": "Interface",
+        "icon": "code",
+        "color": "#66c9ff",
+        "subtitle": "Experiências que fazem sentido.",
+        "description": "Da primeira interação ao último detalhe. Interfaces responsivas, acessíveis e pensadas para quem está do outro lado da tela.",
+        "tools": [
+          {
+            "name": "React",
+            "description": "Interfaces em componentes",
+            "mark": "Re"
+          },
+          {
+            "name": "Next.js",
+            "description": "Renderização e navegação",
+            "mark": "N"
+          },
+          {
+            "name": "TypeScript",
+            "description": "Contratos e tipagem",
+            "mark": "TS"
+          },
+          {
+            "name": "Tailwind CSS",
+            "description": "Sistemas visuais responsivos",
+            "mark": "Tw"
+          }
+        ],
+        "file": "experience.ts",
+        "code": "const experience = {\n  interface: \"intuitive\",\n  accessibility: \"by design\",\n  performance: \"essential\"\n};"
+      },
+      {
+        "id": "backend",
+        "name": "Backend",
+        "label": "Lógica & dados",
+        "icon": "braces",
+        "color": "#a89aff",
+        "subtitle": "A lógica por trás da experiência.",
+        "description": "Regras de negócio, dados e integrações conectados em uma estrutura clara. APIs organizadas para sustentar o que a interface promete.",
+        "tools": [
+          {
+            "name": "Node.js",
+            "description": "Serviços e integrações",
+            "mark": "JS"
+          },
+          {
+            "name": "Python",
+            "description": "Automação e processamento",
+            "mark": "Py"
+          },
+          {
+            "name": "PostgreSQL",
+            "description": "Dados e relacionamentos",
+            "mark": "Pg"
+          },
+          {
+            "name": "REST APIs",
+            "description": "Comunicação entre sistemas",
+            "mark": "{}"
+          }
+        ],
+        "file": "service.ts",
+        "code": "const service = {\n  input: validate(request),\n  logic: resolve(context),\n  output: respond(result)\n};"
+      },
+      {
+        "id": "cybersecurity",
+        "name": "Cybersecurity",
+        "label": "Proteção",
+        "icon": "shield",
+        "color": "#72dded",
+        "subtitle": "Segurança em cada decisão.",
+        "description": "Entender a superfície de ataque faz parte de construir. Estudo de vulnerabilidades, redes e boas práticas em ambientes autorizados.",
+        "tools": [
+          {
+            "name": "Linux",
+            "description": "Sistemas e permissões",
+            "mark": "~/"
+          },
+          {
+            "name": "OWASP",
+            "description": "Riscos em aplicações web",
+            "mark": "OW"
+          },
+          {
+            "name": "Redes",
+            "description": "Protocolos e análise de tráfego",
+            "mark": "IP"
+          },
+          {
+            "name": "AppSec",
+            "description": "Segurança no desenvolvimento",
+            "mark": "</>"
+          }
+        ],
+        "file": "security.ts",
+        "code": "const security = {\n  trust: \"verify first\",\n  access: \"least privilege\",\n  scope: \"authorized only\"\n};"
+      },
+      {
+        "id": "infra",
+        "name": "Infra & DevOps",
+        "label": "Entrega",
+        "icon": "layers",
+        "color": "#90b4ff",
+        "subtitle": "Construir. Versionar. Entregar.",
+        "description": "Ambientes reproduzíveis e entregas consistentes. Ferramentas que conectam o desenvolvimento local à aplicação em produção.",
+        "tools": [
+          {
+            "name": "Git",
+            "description": "Histórico e colaboração",
+            "mark": "Git"
+          },
+          {
+            "name": "Docker",
+            "description": "Ambientes reproduzíveis",
+            "mark": "Dk"
+          },
+          {
+            "name": "CI/CD",
+            "description": "Verificação e entrega contínua",
+            "mark": "↻"
+          },
+          {
+            "name": "Vercel",
+            "description": "Publicação de aplicações",
+            "mark": "▲"
+          }
+        ],
+        "file": "pipeline.ts",
+        "code": "const delivery = [\n  \"commit\",\n  \"build & verify\",\n  \"deploy\"\n];"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Boas ideias começam\ncom uma",
+    "accent": "conversa.",
+    "text": "Um projeto, uma oportunidade ou uma troca de ideias.\nVamos construir algo que faça a diferença."
+  },
+  "updatedAt": null
+}
