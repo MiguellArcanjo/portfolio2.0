@@ -161,3 +161,11 @@
 .lang-switch.in-footer { margin:0 0 0 auto; }
 .footer .lang-switch.in-footer + .socials { margin-left:32px; }
 @media(max-width:560px) { .lang-switch.in-footer { margin:0; } .footer .lang-switch.in-footer + .socials { margin-left:auto; } }
+
+/* About deck: long principles switch to a denser layout instead of being clipped (lib/fit.ts). */
+.portfolio-site .deck-card[data-fit] { padding:24px 26px; }
+.portfolio-site .deck-card[data-fit] h3 { font-size:clamp(24px,2.1vw,29px); }
+.portfolio-site .deck-card[data-fit] p { margin-top:8px; font-size:13.5px; line-height:1.6; }
+.portfolio-site .deck-card[data-fit] .deck-card-foot { margin-top:16px; }
+.portfolio-site .deck-card[data-fit] .deck-number { display:none; }
+.portfolio-site .deck-card[data-fit='scroll'] { overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }

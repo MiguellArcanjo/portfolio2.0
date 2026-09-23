@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Terminal, LockKeyhole, Sparkles, ScanSearch, Code2, ShieldCheck } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { useI18n } from '@/lib/i18n';
+import { watchFit } from '@/lib/fit';
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const traitIcons = [Terminal, LockKeyhole, Sparkles];
@@ -123,6 +124,8 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
       motion.removeEventListener('change', schedule); desktop.removeEventListener('change', schedule);
     };
   }, [about.text, principles.length]);
+
+  useEffect(() => watchFit(Array.from(deck.current?.children ?? []) as HTMLElement[]), [about.principles]);
 
   return <section id="sobre" className="about-story" ref={root}>
     <div className="about-track" ref={track}>

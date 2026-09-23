@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react
 import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { useI18n } from '@/lib/i18n';
+import { watchFit } from '@/lib/fit';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -98,6 +99,9 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
       motion.removeEventListener('change', schedule); desktop.removeEventListener('change', schedule);
     };
   }, [items.length]);
+
+  // Long descriptions or many highlights must never be clipped by the card height.
+  useEffect(() => watchFit(Array.from(row.current?.children ?? []) as HTMLElement[]), [content]);
 
   const go = (index: number) => {
     const rail = track.current;
