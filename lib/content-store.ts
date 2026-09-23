@@ -4,6 +4,7 @@ import { defaultContent, type SiteContent } from './content';
 import { mergeContent } from './content-merge';
 import { translateContent } from './content-translate';
 import { contentRow, defaultLocale, type Locale } from './locales';
+import { isLocale } from './locale-detect';
 import { createClient } from './supabase/client';
 import { revalidateSite } from '@/app/admin/actions';
 
@@ -47,7 +48,12 @@ export async function resetContent(locale: Locale = defaultLocale): Promise<Site
   return saveContent(translateContent(defaultContent, locale), locale);
 }
 
-export const parseContent = (json: string): SiteContent => mergeContent(JSON.parse(json));
+// Exported/imported files carry the language they belong to, so a Spanish file can't land in Portuguese.
+export function parseContent(json: string): { content: SiteContent; locale: Locale | null } {
+  const { _locale, ...stored } = JSON.parse(json);
+  return { content: mergeContent(stored), locale: isLocale(_locale) ? _locale : null };
+}
+export const serializeContent = (content: SiteContent, locale: Locale) => JSON.stringify({ _locale: locale, ...content }, null, 2);
 
 // Content saved by the earlier localStorage mock, offered once as an import into the database.
 export function readLegacyContent(): SiteContent | null {

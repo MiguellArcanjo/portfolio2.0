@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { LayoutDashboard, UserRound, Type, FolderKanban, Layers3, BriefcaseBusiness, Save, RotateCcw, Download, Upload, ExternalLink, MonitorSmartphone, Undo2, CheckCircle2, Menu, X, LogOut, DatabaseZap, Languages, RefreshCw } from 'lucide-react';
 import { defaultContent, type SiteContent } from '@/lib/content';
-import { loadContent, loadTranslatedFromPortuguese, saveContent, resetContent, parseContent, readLegacyContent, clearLegacyContent } from '@/lib/content-store';
+import { loadContent, loadTranslatedFromPortuguese, saveContent, resetContent, parseContent, serializeContent, readLegacyContent, clearLegacyContent } from '@/lib/content-store';
 import { locales, defaultLocale, localeLabels, localePath, type Locale } from '@/lib/locales';
 import { createClient } from '@/lib/supabase/client';
 import { Dashboard, ProfileEditor, TextsEditor, ProjectsEditor, StackEditor, ExperienceEditor, type SectionId } from '@/components/admin/editors';
@@ -98,13 +98,20 @@ function Editor({ email }: { email: string }) {
   const importLegacy = () => { if (legacy) setDraft(legacy); clearLegacyContent(); setLegacy(null); };
   const dismissLegacy = () => { clearLegacyContent(); setLegacy(null); };
   const exportJson = () => {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(draft, null, 2)], { type: 'application/json' }));
+    const url = URL.createObjectURL(new Blob([serializeContent(draft, locale)], { type: 'application/json' }));
     const link = document.createElement('a'); link.href = url; link.download = `portfolio-conteudo-${locale}-${new Date().toISOString().slice(0, 10)}.json`; link.click();
     URL.revokeObjectURL(url);
   };
   const importJson = async (selected?: File) => {
     if (!selected) return;
-    try { setDraft(parseContent(await selected.text())); }
+    try {
+      const imported = parseContent(await selected.text());
+      if (imported.locale && imported.locale !== locale) {
+        alert(`Este arquivo é da versão em ${localeLabels[imported.locale].name}, mas o painel está editando ${localeLabels[locale].name}.\n\nSelecione ${localeLabels[imported.locale].short} no topo do painel e importe de novo.`);
+      } else if (confirm(`Substituir o rascunho em ${localeLabels[locale].name} pelo conteúdo de "${selected.name}"? Nada é publicado até você clicar em Salvar.`)) {
+        setDraft(imported.content);
+      }
+    }
     catch { alert('Arquivo inválido. Use um JSON exportado por este painel.'); }
     if (file.current) file.current.value = '';
   };
