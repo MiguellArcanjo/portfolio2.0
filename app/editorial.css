@@ -134,3 +134,16 @@
 
 .project-preview.has-image{padding:0;align-items:stretch}
 .project-preview.has-image img{display:block;width:100%;height:100%;object-fit:cover}
+
+/* Language switch: same quiet type as the nav, active language underlined. */
+.portfolio-site .nav { margin-right:44px; }
+.lang-switch { display:flex; align-items:center; gap:4px; margin-right:44px; font-family:var(--font-dm-sans),sans-serif; font-size:12.5px; letter-spacing:.04em; }
+.lang-switch a { position:relative; padding:6px 7px; color:#7f8385; transition:color .25s; }
+.lang-switch a + a:before { content:''; position:absolute; left:-3px; top:50%; width:1px; height:10px; background:#45484a; transform:translateY(-50%); }
+.lang-switch a:after { content:''; position:absolute; left:7px; right:7px; bottom:1px; height:1px; background:#eae7df; transform:scaleX(0); transform-origin:left; transition:transform .35s cubic-bezier(.22,1,.36,1); }
+.lang-switch a:hover { color:#d8d6ce; }
+.lang-switch a[aria-current] { color:#eae7df; }
+.lang-switch a[aria-current]:after { transform:scaleX(1); }
+.lang-switch a:focus-visible { outline:1px solid #a8cde0; outline-offset:2px; }
+@media(max-width:800px) { .portfolio-site .nav { margin-right:28px; } .lang-switch { margin-right:24px; } }
+@media(max-width:560px) { .lang-switch { margin-left:auto; margin-right:14px; font-size:11.5px; } .lang-switch a { padding:6px 5px; } .lang-switch a:after { left:5px; right:5px; } .portfolio-site .header-contact { margin-left:0; } }

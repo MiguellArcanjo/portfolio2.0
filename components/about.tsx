@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Terminal, LockKeyhole, Sparkles, ScanSearch, Code2, ShieldCheck } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
+import { useI18n } from '@/lib/i18n';
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const traitIcons = [Terminal, LockKeyhole, Sparkles];
@@ -21,6 +22,7 @@ const scramble = (word: string) => Array.from(word, char => /\s/.test(char) ? ch
 const principleIcons = [ScanSearch, Code2, ShieldCheck];
 
 export function About({ profile, about }: { profile: SiteContent['profile']; about: SiteContent['about'] }) {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const copy = useRef<HTMLParagraphElement>(null);
@@ -107,7 +109,7 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
         <div className="about-giant" aria-hidden="true"><div ref={giant}>{about.marquee} {about.marquee}</div></div>
         <div className="container about-stage">
           <div className="about-main">
-            <div className="section-label"><span>01 /</span> SOBRE MIM</div>
+            <div className="section-label"><span>01 /</span> {t.labels.about}</div>
             <h2>{about.title}<br/><span>{about.accent}</span></h2>
             <p className="about-hello">{about.intro} <strong>{profile.name}</strong></p>
             <p className="about-cipher" ref={copy} aria-label={about.text}>{words.map((word, index) => <span key={index} aria-hidden="true" data-state="idle">{word}</span>)}</p>
@@ -115,7 +117,7 @@ export function About({ profile, about }: { profile: SiteContent['profile']; abo
           </div>
           <div className="about-deck-wrap">
             
-            <div className="about-deck" ref={deck} role="list" aria-label="Anotações pessoais">
+            <div className="about-deck" ref={deck} role="list" aria-label={t.personalNotes}>
               {principles.map((item, index) => { const Icon = principleIcons[index % principleIcons.length]; return <article key={index} className="deck-card" role="listitem" style={{ '--i': index } as CSSProperties}>
                 <div className="deck-card-top"><span className="deck-icon"><Icon size={20}/></span></div>
                 <span className="deck-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>

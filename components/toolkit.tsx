@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties, type Pointer
 import { ArrowDown, Terminal, LockKeyhole } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { AreaIcon } from './area-icon';
+import { useI18n } from '@/lib/i18n';
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -21,6 +22,7 @@ const untilt = (event: ReactPointerEvent<HTMLElement>) => { event.currentTarget.
 
 export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
   const areas = content.areas;
+  const { t } = useI18n();
   const [chosen, setSelected] = useState(0);
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -107,13 +109,13 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
   if (!area) return null;
   return <section id="stack" className="toolkit-story" ref={root} style={{ '--tool-color': area.color, '--count': areas.length } as CSSProperties}>
     <div className="container toolkit-heading" ref={heading}>
-      <div><div className="section-label"><span>03 /</span> STACK</div><h2>{content.title}<br/><span>{content.accent}</span></h2></div>
+      <div><div className="section-label"><span>03 /</span> {t.labels.stack}</div><h2>{content.title}<br/><span>{content.accent}</span></h2></div>
       <p>{lines(content.text)}</p>
     </div>
     <div className="toolkit-track" ref={track}>
       <div className="toolkit-pin container">
-        <div className="toolkit-meta"><span><Terminal size={14}/> Ferramentas</span><span className="meta-hint"><ArrowDown size={13}/> Role para mudar de área</span><span>CAMADA <b>{pad(selected + 1)}</b> / {pad(areas.length)}</span></div>
-        <div className="toolkit-steps" role="tablist" aria-label="Áreas de conhecimento">
+        <div className="toolkit-meta"><span><Terminal size={14}/> {t.tools}</span><span className="meta-hint"><ArrowDown size={13}/> {t.scrollAreas}</span><span>{t.layer} <b>{pad(selected + 1)}</b> / {pad(areas.length)}</span></div>
+        <div className="toolkit-steps" role="tablist" aria-label={t.knowledgeAreas}>
           {areas.map((item, index) => <button key={item.id} ref={element => { tabs.current[index] = element; }} id={`tool-tab-${index}`} role="tab" aria-selected={selected === index} aria-controls="tool-panel" tabIndex={selected === index ? 0 : -1} onClick={() => choose(index)} onKeyDown={event => {
             let next = index;
             if (event.key === 'ArrowRight') next = (index + 1) % areas.length;
@@ -148,7 +150,7 @@ export function Toolkit({ content }: { content: SiteContent['toolkit'] }) {
             <h3 aria-label={area.subtitle}>{area.subtitle.split(' ').map((word, index) => <span key={index} aria-hidden="true" style={{ '--w': index } as CSSProperties}>{word}</span>)}</h3>
             <p>{area.description}</p>
             <div className="tool-tiles">{area.tools.map((tool, index) => <div className="tool-tile" key={index} style={{ '--t': index } as CSSProperties} onPointerMove={tilt} onPointerLeave={untilt}><span className="tool-mark">{tool.mark}</span><div><h4>{tool.name}</h4><p>{tool.description}</p></div><span className="tool-tile-number">{pad(index + 1)}</span></div>)}</div>
-            {area.code.trim() && <div className="tool-code"><div className="code-bar"><i/><i/><i/><span>{area.file}</span><small>TRECHO DE CÓDIGO</small></div><pre aria-label={`Exemplo conceitual: ${area.file}`}><code>{area.code.split('\n').map((line, index) => <span key={index} style={{ '--l': index } as CSSProperties}><i>{index + 1}</i>{line}</span>)}</code></pre></div>}
+            {area.code.trim() && <div className="tool-code"><div className="code-bar"><i/><i/><i/><span>{area.file}</span><small>{t.codeSnippet}</small></div><pre aria-label={t.codeExample(area.file)}><code>{area.code.split('\n').map((line, index) => <span key={index} style={{ '--l': index } as CSSProperties}><i>{index + 1}</i>{line}</span>)}</code></pre></div>}
           </div>
         </div>
       </div>

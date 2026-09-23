@@ -3,12 +3,14 @@
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
+import { useI18n } from '@/lib/i18n';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const pad = (value: number) => String(value).padStart(2, '0');
 
 export function Experience({ content }: { content: SiteContent['experience'] }) {
   const items = content.items;
+  const { t } = useI18n();
   const [active, setActive] = useState(0);
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -87,16 +89,16 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
 
   return <section id="experiencia" className="xp-story" ref={root} style={{ '--count': items.length } as CSSProperties}>
     <div className="container xp-heading">
-      <div><div className="section-label"><span>04 /</span> EXPERIÊNCIA</div><h2>{content.title}<br/><span>{content.accent}</span></h2></div>
+      <div><div className="section-label"><span>04 /</span> {t.labels.experience}</div><h2>{content.title}<br/><span>{content.accent}</span></h2></div>
       <p>{lines(content.text)}</p>
     </div>
     <div className="xp-track" ref={track}>
       <div className="xp-pin">
-        <div className="container xp-meta"><span className="xp-hint"><ArrowDown size={14}/> Role para percorrer a trajetória</span><span className="xp-counter">{pad(active + 1)} <i>/ {pad(items.length)}</i></span></div>
+        <div className="container xp-meta"><span className="xp-hint"><ArrowDown size={14}/> {t.scrollTimeline}</span><span className="xp-counter">{pad(active + 1)} <i>/ {pad(items.length)}</i></span></div>
         <div className="xp-viewport">
           <div className="xp-row" ref={row}>
             {items.map((item, index) => <article key={item.id} id={`xp-${item.id}`} className={`xp-card ${index === active ? 'is-active' : ''}`} style={{ '--i': index } as CSSProperties} onClick={() => index !== active && go(index)} aria-labelledby={`xp-role-${item.id}`}>
-              <div className="xp-card-top"><span className="xp-type">{item.type}</span>{item.current && <span className="xp-now"><i/> Atual</span>}</div>
+              <div className="xp-card-top"><span className="xp-type">{item.type}</span>{item.current && <span className="xp-now"><i/> {t.current}</span>}</div>
               <p className="xp-period">{item.period}</p>
               <h3 id={`xp-role-${item.id}`}>{item.role}</h3>
               <p className="xp-company">{item.company}{item.location && <span> · {item.location}</span>}</p>
@@ -104,14 +106,14 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
               {item.highlights.length > 0 && <ul className="xp-highlights">{item.highlights.map((highlight, point) => <li key={point} style={{ '--h': point } as CSSProperties}>{highlight}</li>)}</ul>}
               <div className="xp-card-foot">
                 <div className="xp-tags">{item.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
-                {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="xp-link" onClick={event => event.stopPropagation()}>Ver mais <ArrowUpRight size={15}/></a>}
+                {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="xp-link" onClick={event => event.stopPropagation()}>{t.seeMore} <ArrowUpRight size={15}/></a>}
               </div>
               <span className="xp-number" aria-hidden="true">{pad(index + 1)}</span>
             </article>)}
           </div>
         </div>
         <div className="container">
-          <div className="xp-timeline" ref={timeline} aria-label="Linha do tempo">
+          <div className="xp-timeline" ref={timeline} aria-label={t.timeline}>
             <span className="xp-line"><i/></span>
             {items.map((item, index) => <button key={item.id} className={`xp-marker ${index <= active ? 'is-passed' : ''} ${index === active ? 'is-active' : ''}`} style={{ '--x': items.length > 1 ? index / (items.length - 1) : 0 } as CSSProperties} onClick={() => go(index)} aria-label={`${item.role}, ${item.period}`} aria-current={index === active ? 'step' : undefined}><i/><span>{item.period}</span></button>)}
           </div>

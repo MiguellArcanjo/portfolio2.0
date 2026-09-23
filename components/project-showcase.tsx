@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import type { Project, SiteContent } from '@/lib/content';
 import { ProjectPreview } from './project-preview';
+import { useI18n } from '@/lib/i18n';
 
 export function ProjectShowcase({ projects, heading, onSelect }: { projects: Project[]; heading: SiteContent['projectsSection']; onSelect: (project: Project) => void }) {
-  const [filter, setFilter] = useState('Todos');
+  const { t } = useI18n();
+  const ALL = '__all__';
+  const [filter, setFilter] = useState(ALL);
   const root = useRef<HTMLElement>(null);
-  const categories = ['Todos', ...new Set(projects.map(project => project.category).filter(Boolean))];
-  const visible = projects.filter(project => filter === 'Todos' || project.category === filter);
+  const categories = [ALL, ...new Set(projects.map(project => project.category).filter(Boolean))];
+  const visible = projects.filter(project => filter === ALL || project.category === filter);
   const number = (value: number) => String(value).padStart(2, '0');
 
   useEffect(() => {
@@ -70,35 +73,35 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
 
   return <section id="projetos" className="projects-story" ref={root}>
     <div className="container section-heading story-heading">
-      <div><div className="section-label"><span>02 /</span> PROJETOS</div><h2>{heading.title} <span>{heading.accent}</span></h2></div>
-      <div className="filters" aria-label="Filtrar projetos">
-        {categories.map(value => <button key={value} aria-pressed={filter === value} className={filter === value ? 'active' : ''} onClick={() => setFilter(value)}>{value}{value === 'Todos' && <span>{String(projects.length).padStart(2, '0')}</span>}</button>)}
+      <div><div className="section-label"><span>02 /</span> {t.labels.projects}</div><h2>{heading.title} <span>{heading.accent}</span></h2></div>
+      <div className="filters" aria-label={t.filterProjects}>
+        {categories.map(value => <button key={value} aria-pressed={filter === value} className={filter === value ? 'active' : ''} onClick={() => setFilter(value)}>{value === ALL ? t.all : value}{value === ALL && <span>{String(projects.length).padStart(2, '0')}</span>}</button>)}
       </div>
     </div>
     <div className="project-chapters">
       {visible.map((project, index) => <article id={`projeto-${project.id}`} key={project.id} className={`project-chapter ${index % 2 ? 'chapter-reverse' : ''}`} aria-labelledby={`title-${project.id}`}>
         <div className="chapter-pin container">
-          <div className="chapter-meta"><span>PROJETO / {number(index + 1)}</span><span>{number(index + 1)} <i>/ {number(visible.length)}</i></span></div>
+          <div className="chapter-meta"><span>{t.project.toUpperCase()} / {number(index + 1)}</span><span>{number(index + 1)} <i>/ {number(visible.length)}</i></span></div>
           <div className="chapter-layout">
-            <div className="chapter-visual"><ProjectPreview kind={project.kind} image={project.image} alt={`Capa do projeto ${project.title}`} placeholder={project.description.startsWith('[')}/></div>
+            <div className="chapter-visual"><ProjectPreview kind={project.kind} image={project.image} alt={t.coverOf(project.title)} placeholder={project.description.startsWith('[')}/></div>
             <div className="chapter-copy">
               <span className="chapter-category">{project.category}</span>
               <h3 id={`title-${project.id}`}>{project.title}<span>.</span></h3>
-              <div className="chapter-steps" aria-label={`Etapas de ${project.title}`}>
-                {['Projeto', 'Implementação', 'Stack'].map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}</button>)}
+              <div className="chapter-steps" aria-label={t.projectStages(project.title)}>
+                {t.stages.map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}</button>)}
               </div>
               <div className="chapter-phases">
-                <div className="chapter-phase phase-intro"><span className="phase-scroll"><ArrowDown size={16}/> Detalhes ao rolar</span></div>
+                <div className="chapter-phase phase-intro"><span className="phase-scroll"><ArrowDown size={16}/> {t.scrollDetails}</span></div>
                 <div className="chapter-phase phase-description"><p className="chapter-description">{project.description}</p></div>
                 <div className="chapter-phase phase-technologies"><div className="chapter-stack"><div className="tags">{project.tags.map((tag, tagIndex) => <span key={tag} style={{ animationDelay: `${tagIndex * 100}ms` }}>{tag}</span>)}</div></div>
-                  <button className="chapter-action" onClick={() => onSelect(project)}>Detalhes do projeto <ArrowUpRight size={20}/></button>
-                  {project.github && <a className="text-link" href={project.github} target="_blank" rel="noopener noreferrer">Repositório <ArrowUpRight size={16}/></a>}
-                  {project.live && <a className="text-link" href={project.live} target="_blank" rel="noopener noreferrer">Ver projeto online <ArrowUpRight size={16}/></a>}
+                  <button className="chapter-action" onClick={() => onSelect(project)}>{t.projectDetails} <ArrowUpRight size={20}/></button>
+                  {project.github && <a className="text-link" href={project.github} target="_blank" rel="noopener noreferrer">{t.repository} <ArrowUpRight size={16}/></a>}
+                  {project.live && <a className="text-link" href={project.live} target="_blank" rel="noopener noreferrer">{t.liveProject} <ArrowUpRight size={16}/></a>}
                 </div>
               </div>
             </div>
           </div>
-          <div className="chapter-bottom">{index < visible.length - 1 ? <a href={`#projeto-${visible[index + 1].id}`}>Próximo: {visible[index + 1].title} <ArrowDown size={15}/></a> : <a href="#stack">Stack de trabalho <ArrowDown size={15}/></a>}</div>
+          <div className="chapter-bottom">{index < visible.length - 1 ? <a href={`#projeto-${visible[index + 1].id}`}>{t.next}: {visible[index + 1].title} <ArrowDown size={15}/></a> : <a href="#stack">{t.stackLink} <ArrowDown size={15}/></a>}</div>
           <div className="chapter-progress" aria-hidden="true"><span/></div>
         </div>
       </article>)}

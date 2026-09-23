@@ -185,3 +185,12 @@
 .adm-image-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
 .adm-image-status{min-height:16px;font-size:12px;color:var(--danger)}
 @media(max-width:860px){.adm-image{grid-template-columns:1fr}.adm-banner{flex-wrap:wrap}}
+
+/* Content language selector in the top bar. */
+.adm-locale{display:flex;align-items:center;gap:2px;padding:3px 3px 3px 10px;border:1px solid var(--line-2);border-radius:9px;background:#0a0f17;color:var(--faint)}
+.adm-locale>svg{margin-right:6px}
+.adm-locale button{padding:5px 10px;border-radius:6px;background:none;color:var(--dim);font-size:12px;font-weight:600;letter-spacing:.04em;transition:background .2s,color .2s}
+.adm-locale button:hover{color:var(--text)}
+.adm-locale button[aria-checked=true]{background:#66c9ff1f;color:var(--accent)}
+.adm-banner.subtle{border-color:var(--line);background:transparent;color:var(--dim)}
+@media(max-width:860px){.adm-locale{order:3}}

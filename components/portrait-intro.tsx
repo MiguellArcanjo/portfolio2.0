@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowDown } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
+import { useI18n } from '@/lib/i18n';
 
 export function PortraitIntro({ profile }: { profile: SiteContent['profile'] }) {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const [failed, setFailed] = useState(false);
   const parts = profile.name.trim().split(/\s+/);
@@ -41,13 +43,13 @@ export function PortraitIntro({ profile }: { profile: SiteContent['profile'] }) 
     };
   }, []);
 
-  return <section className="portrait-intro" ref={root} aria-label="Apresentação" style={{ '--portrait-name-size': `${Math.min(9, 77 / longest)}vw` } as CSSProperties}>
+  return <section className="portrait-intro" ref={root} aria-label={t.intro} style={{ '--portrait-name-size': `${Math.min(9, 77 / longest)}vw` } as CSSProperties}>
     <div className="portrait-pin">
       <div className="portrait-frame">
-        {!failed && profile.photo ? <img src={profile.photo} alt={profile.photoAlt} fetchPriority="high" decoding="async" onError={() => setFailed(true)} style={{ objectPosition: profile.photoPosition || '50% 50%' }}/> : <div className="portrait-fallback" role="img" aria-label="Espaço para retrato"><span>{profile.initials}</span></div>}
+        {!failed && profile.photo ? <img src={profile.photo} alt={profile.photoAlt} fetchPriority="high" decoding="async" onError={() => setFailed(true)} style={{ objectPosition: profile.photoPosition || '50% 50%' }}/> : <div className="portrait-fallback" role="img" aria-label={t.portraitPlaceholder}><span>{profile.initials}</span></div>}
       </div>
       <div className="portrait-type"><p className="portrait-name" aria-label={profile.name}>{name.map((line, index) => <span key={index} aria-hidden="true">{line}</span>)}</p></div>
-      <a className="portrait-continue" href="#inicio" aria-label="Continuar para o portfólio"><ArrowDown size={22}/></a>
+      <a className="portrait-continue" href="#inicio" aria-label={t.continue}><ArrowDown size={22}/></a>
     </div>
   </section>;
 }
