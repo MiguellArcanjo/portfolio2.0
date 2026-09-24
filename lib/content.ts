@@ -18,6 +18,8 @@ export type Project = {
   kind: PreviewKind;
   /** Capa enviada ao Storage. Vazia = prévia ilustrada do tipo escolhido. */
   image?: string;
+  /** Capa vertical usada em telas até 900px. Vazia = usa a capa normal. */
+  imageMobile?: string;
   github: string;
   live: string;
 };

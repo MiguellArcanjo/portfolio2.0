@@ -1,7 +1,13 @@
 import { ShieldCheck, Plus } from 'lucide-react';
 
-export function ProjectPreview({ kind, placeholder = false, image, alt = '' }: { kind: string; placeholder?: boolean; image?: string; alt?: string }) {
-  if (image) return <div className={`project-preview has-image ${kind}`}><img src={image} alt={alt} loading="lazy" decoding="async"/></div>;
+export function ProjectPreview({ kind, placeholder = false, image, imageMobile, alt = '' }: { kind: string; placeholder?: boolean; image?: string; imageMobile?: string; alt?: string }) {
+  // <picture> lets phones download only the portrait cover and desktops only the wide one.
+  if (image || imageMobile) return <div className={`project-preview has-image ${imageMobile ? 'has-mobile-image' : ''} ${kind}`}>
+    <picture>
+      {imageMobile && <source media="(max-width: 900px)" srcSet={imageMobile}/>}
+      <img src={image || imageMobile} alt={alt} loading="lazy" decoding="async"/>
+    </picture>
+  </div>;
   if (placeholder) return <div className={`project-preview source-placeholder ${kind}`} aria-hidden="true">
     <div className="project-skeleton"><div className="skeleton-sidebar"><i/><i/><i/></div><div className="skeleton-content"><span/><div className="skeleton-grid"><i/><i/><i/></div><div className="skeleton-lines"><i/><i/><i/></div></div></div>
   </div>;

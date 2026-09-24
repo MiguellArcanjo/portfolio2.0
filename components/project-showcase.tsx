@@ -98,7 +98,7 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
         <div className="chapter-pin container">
           <div className="chapter-meta"><span>{t.project.toUpperCase()} / {number(index + 1)}</span><span>{number(index + 1)} <i>/ {number(visible.length)}</i></span></div>
           <div className="chapter-layout">
-            <div className="chapter-visual" onClick={() => onSelect(project)} title={t.openProject}><ProjectPreview kind={project.kind} image={project.image} alt={t.coverOf(project.title)} placeholder={project.description.startsWith('[')}/></div>
+            <div className="chapter-visual" onClick={() => onSelect(project)} title={t.openProject}><ProjectPreview kind={project.kind} image={project.image} imageMobile={project.imageMobile} alt={t.coverOf(project.title)} placeholder={project.description.startsWith('[')}/></div>
             <div className="chapter-copy">
               <span className="chapter-category">{project.category}</span>
               <h3 id={`title-${project.id}`}>{project.title}<span>.</span></h3>

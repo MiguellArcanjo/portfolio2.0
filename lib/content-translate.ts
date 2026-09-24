@@ -101,7 +101,7 @@ const tables: Record<Exclude<Locale, 'pt'>, Map<string, string>> = {
 };
 
 // Structural values (ids, colors, URLs, code) are never translated.
-const skip = new Set(['id', 'icon', 'color', 'kind', 'photo', 'photoPosition', 'image', 'github', 'live', 'link', 'email', 'linkedin', 'code', 'file', 'mark', 'category', 'updatedAt', 'initials', 'name']);
+const skip = new Set(['id', 'icon', 'color', 'kind', 'photo', 'photoPosition', 'image', 'imageMobile', 'github', 'live', 'link', 'email', 'linkedin', 'code', 'file', 'mark', 'category', 'updatedAt', 'initials', 'name']);
 
 function translate(value: unknown, table: Map<string, string>, locale: Locale, key = ''): unknown {
   if (typeof value === 'string') {

@@ -152,6 +152,7 @@ export function ProjectsEditor({ content, edit }: { content: SiteContent; edit: 
           <Select label="Prévia visual" value={project.kind} options={previewKinds.map(kind => ({ value: kind, label: kindLabels[kind] }))} onChange={set('kind')}/>
         </div>
         <ImageField label="Capa do projeto" folder="projetos" value={project.image ?? ''} onChange={set('image')} previewStyle={{ aspectRatio: '16 / 10' }} hint="Opcional. Sem capa, o site mostra a prévia ilustrada escolhida acima."/>
+        <ImageField label="Capa para celular" folder="projetos" maxSize={1400} value={project.imageMobile ?? ''} onChange={set('imageMobile')} previewStyle={{ aspectRatio: '4 / 5' }} hint="Opcional. Imagem vertical (ideal 1080 × 1350, proporção 4:5) mostrada em telas de celular e tablet no lugar da capa acima."/>
         <TextArea label="Descrição curta" rows={2} value={project.description} onChange={set('description')}/>
         <TextArea label="Detalhes (modal)" rows={4} value={project.detail} onChange={set('detail')}/>
         <Chips label="Tecnologias" values={project.tags} onChange={set('tags')}/>

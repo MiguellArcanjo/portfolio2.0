@@ -13,7 +13,7 @@ export function mergeContent(value: unknown): SiteContent {
     strip: { ...defaultContent.strip, ...stored.strip },
     about: { ...defaultContent.about, ...stored.about },
     projectsSection: { ...defaultContent.projectsSection, ...stored.projectsSection },
-    projects: (stored.projects ?? defaultContent.projects).map(project => ({ image: '', ...project })),
+    projects: (stored.projects ?? defaultContent.projects).map(project => ({ image: '', imageMobile: '', ...project })),
     toolkit: { ...defaultContent.toolkit, ...stored.toolkit },
     experience: { ...defaultContent.experience, ...stored.experience },
     contact: { ...defaultContent.contact, ...stored.contact },

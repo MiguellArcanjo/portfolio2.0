@@ -232,3 +232,11 @@
  .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled]:not([data-end]) { -webkit-mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); }
  .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled][data-end] { -webkit-mask:linear-gradient(transparent,#000 36px); mask:linear-gradient(transparent,#000 36px); }
 }
+
+/* Portrait cover on phones: the frame follows the image's own proportions instead of cropping it. */
+.project-preview.has-image picture { display:block; width:100%; height:100%; }
+.project-preview.has-image picture img { display:block; width:100%; height:100%; object-fit:cover; }
+@media(max-width:900px) {
+ .portfolio-site .chapter-visual > .project-preview.has-mobile-image,.project-dialog .project-preview.has-mobile-image { height:auto; }
+ .project-preview.has-mobile-image picture img { height:auto; object-fit:contain; }
+}
