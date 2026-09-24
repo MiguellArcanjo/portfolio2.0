@@ -83,7 +83,7 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
         <div className="chapter-pin container">
           <div className="chapter-meta"><span>{t.project.toUpperCase()} / {number(index + 1)}</span><span>{number(index + 1)} <i>/ {number(visible.length)}</i></span></div>
           <div className="chapter-layout">
-            <div className="chapter-visual"><ProjectPreview kind={project.kind} image={project.image} alt={t.coverOf(project.title)} placeholder={project.description.startsWith('[')}/></div>
+            <div className="chapter-visual" onClick={() => onSelect(project)} title={t.openProject}><ProjectPreview kind={project.kind} image={project.image} alt={t.coverOf(project.title)} placeholder={project.description.startsWith('[')}/></div>
             <div className="chapter-copy">
               <span className="chapter-category">{project.category}</span>
               <h3 id={`title-${project.id}`}>{project.title}<span>.</span></h3>
@@ -91,12 +91,14 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
                 {t.stages.map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}</button>)}
               </div>
               <div className="chapter-phases">
-                <div className="chapter-phase phase-intro"><span className="phase-scroll"><ArrowDown size={16}/> {t.scrollDetails}</span></div>
-                <div className="chapter-phase phase-description"><p className="chapter-description">{project.description}</p></div>
-                <div className="chapter-phase phase-technologies"><div className="chapter-stack"><div className="tags">{project.tags.map((tag, tagIndex) => <span key={tag} style={{ animationDelay: `${tagIndex * 100}ms` }}>{tag}</span>)}</div></div>
-                  <button className="chapter-action" onClick={() => onSelect(project)}>{t.projectDetails} <ArrowUpRight size={20}/></button>
-                  {project.github && <a className="text-link" href={project.github} target="_blank" rel="noopener noreferrer">{t.repository} <ArrowUpRight size={16}/></a>}
-                  {project.live && <a className="text-link" href={project.live} target="_blank" rel="noopener noreferrer">{t.liveProject} <ArrowUpRight size={16}/></a>}
+                {/* Everything is read while scrolling: no extra click to reach the details. */}
+                <div className="chapter-phase phase-intro"><span className="phase-kicker">{t.stages[0]}</span><p className="chapter-description">{project.description}</p><span className="phase-scroll"><ArrowDown size={16}/> {t.scrollDetails}</span></div>
+                <div className="chapter-phase phase-description"><span className="phase-kicker">{t.stages[1]}</span><p className="chapter-description">{project.detail || project.description}</p></div>
+                <div className="chapter-phase phase-technologies"><span className="phase-kicker">{t.stages[2]}</span><div className="chapter-stack"><div className="tags">{project.tags.map((tag, tagIndex) => <span key={tag} style={{ animationDelay: `${tagIndex * 100}ms` }}>{tag}</span>)}</div></div>
+                  {(project.live || project.github) && <div className="chapter-links">
+                    {project.live && <a className="chapter-link primary" href={project.live} target="_blank" rel="noopener noreferrer">{t.liveProject} <ArrowUpRight size={16}/></a>}
+                    {project.github && <a className="chapter-link" href={project.github} target="_blank" rel="noopener noreferrer">{t.repository} <ArrowUpRight size={16}/></a>}
+                  </div>}
                 </div>
               </div>
             </div>

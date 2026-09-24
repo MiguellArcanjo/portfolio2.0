@@ -195,3 +195,25 @@
 .portfolio-site .toolkit-detail[data-fit] .tool-tile p { font-size:10.5px; }
 .portfolio-site .toolkit-detail[data-fit] .tool-code { display:none; }
 .portfolio-site .toolkit-detail[data-fit='scroll'] { overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; padding-right:10px; }
+
+/* Project chapters: overview, implementation and stack are read while scrolling (no detail modal needed). */
+.portfolio-site .phase-intro { display:block; }
+.portfolio-site .phase-kicker { display:block; margin-bottom:10px; font-family:var(--font-dm-sans),sans-serif; font-size:12px; letter-spacing:.02em; color:#8a8f92; }
+.portfolio-site .phase-scroll { display:none; }
+.portfolio-site .chapter-phase + .chapter-phase { margin-top:26px; }
+.chapter-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+.chapter-link { display:inline-flex; align-items:center; gap:10px; padding:11px 18px; border:1px solid #55595c; border-radius:999px; font-size:14px; color:#dcdad2; transition:background .3s,color .3s,border-color .3s; }
+.chapter-link svg { transition:transform .35s cubic-bezier(.22,1,.36,1); }
+.chapter-link:hover { border-color:#eae7df; color:#fff; }
+.chapter-link:hover svg { transform:translate(2px,-2px); }
+.chapter-link.primary { background:#eae7df; border-color:#eae7df; color:#141517; }
+.chapter-link.primary:hover { background:#fff; color:#101113; }
+.portfolio-site .chapter-visual { cursor:zoom-in; }
+@media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
+ .portfolio-site .chapter-phases { display:grid; height:auto; }
+ .portfolio-site .chapter-phase { position:relative; inset:auto; grid-area:1 / 1; }
+ .portfolio-site .chapter-phase + .chapter-phase { margin-top:0; }
+ .portfolio-site .phase-kicker { display:none; }
+ .portfolio-site .phase-scroll { display:flex; margin-top:22px; }
+ .portfolio-site .project-chapter[data-stage='2'] .chapter-link { animation:tech-arrive .6s both cubic-bezier(.22,1,.36,1); animation-delay:.25s; }
+}
