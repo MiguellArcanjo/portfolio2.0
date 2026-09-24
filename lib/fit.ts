@@ -28,3 +28,21 @@ export function watchFit(cards: HTMLElement[]) {
   fitAll();
   return () => observer.disconnect();
 }
+
+// Boxes whose children overlap (the project phases share one grid cell) are measured by scroll height.
+export function fitBox(box: HTMLElement) {
+  delete box.dataset.fit;
+  if (box.scrollHeight <= box.clientHeight + 1) return;
+  box.dataset.fit = 'dense';
+  if (box.scrollHeight <= box.clientHeight + 1) return;
+  box.dataset.fit = 'scroll';
+}
+
+export function watchBoxes(boxes: HTMLElement[]) {
+  const fitAll = () => boxes.forEach(fitBox);
+  const observer = new ResizeObserver(fitAll);
+  boxes.forEach(box => observer.observe(box));
+  document.fonts?.ready.then(fitAll);
+  fitAll();
+  return () => observer.disconnect();
+}

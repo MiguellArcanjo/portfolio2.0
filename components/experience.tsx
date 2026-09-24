@@ -5,6 +5,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { useI18n } from '@/lib/i18n';
 import { watchFit } from '@/lib/fit';
+import { RichText } from './rich-text';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -132,7 +133,7 @@ export function Experience({ content }: { content: SiteContent['experience'] }) 
               <p className="xp-period">{item.period}</p>
               <h3 id={`xp-role-${item.id}`}>{item.role}</h3>
               <p className="xp-company">{item.company}{item.location && <span> · {item.location}</span>}</p>
-              <p className="xp-description">{item.description}</p>
+              <RichText className="xp-description" text={item.description}/>
               {item.highlights.length > 0 && <ul className="xp-highlights">{item.highlights.map((highlight, point) => <li key={point} style={{ '--h': point } as CSSProperties}>{highlight}</li>)}</ul>}
               <div className="xp-card-foot">
                 <div className="xp-tags">{item.tags.map(tag => <span key={tag}>{tag}</span>)}</div>

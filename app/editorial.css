@@ -217,3 +217,18 @@
  .portfolio-site .phase-scroll { display:flex; margin-top:22px; }
  .portfolio-site .project-chapter[data-stage='2'] .chapter-link { animation:tech-arrive .6s both cubic-bezier(.22,1,.36,1); animation-delay:.25s; }
 }
+
+/* Text written in the admin keeps its paragraphs and bullet lists (components/rich-text.tsx). */
+.rich-text > * + * { margin-top:.85em; }
+.rich-text ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5em; }
+.rich-text li { position:relative; padding-left:1.35em; }
+.rich-text li:before { content:''; position:absolute; left:0; top:.78em; width:.75em; height:1px; background:currentColor; opacity:.55; }
+
+/* Project phases never push the chapter past the screen: denser text first, inner scroll as a last resort. */
+@media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
+ .portfolio-site .chapter-phases { max-height:max(220px, calc(100svh - 490px - var(--header-space, 0px))); overflow:hidden; }
+ .portfolio-site .chapter-phases[data-fit] .chapter-description { font-size:15px; line-height:1.6; }
+ .portfolio-site .chapter-phases[data-fit='scroll']:not([data-end]) { -webkit-mask:linear-gradient(#000 calc(100% - 48px),transparent); mask:linear-gradient(#000 calc(100% - 48px),transparent); }
+ .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled]:not([data-end]) { -webkit-mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); }
+ .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled][data-end] { -webkit-mask:linear-gradient(transparent,#000 36px); mask:linear-gradient(transparent,#000 36px); }
+}

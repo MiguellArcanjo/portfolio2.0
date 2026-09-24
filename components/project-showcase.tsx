@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import type { Project, SiteContent } from '@/lib/content';
 import { ProjectPreview } from './project-preview';
+import { RichText } from './rich-text';
+import { watchBoxes } from '@/lib/fit';
 import { useI18n } from '@/lib/i18n';
 
 export function ProjectShowcase({ projects, heading, onSelect }: { projects: Project[]; heading: SiteContent['projectsSection']; onSelect: (project: Project) => void }) {
@@ -46,6 +48,16 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
         chapter.style.setProperty('--chapter-opacity', `${animate ? .2 + entry * .8 : 1}`);
         chapter.style.setProperty('--chapter-scale', `${animate ? .94 + entry * .06 : 1}`);
         chapter.style.setProperty('--chapter-progress', `${progress * 100}%`);
+        // Implementation notes too long for the pinned box are read by scrolling the page itself:
+        // during that stage the page scroll moves the text, so nothing needs an inner scroll gesture.
+        const phases = chapter.querySelector<HTMLElement>('.chapter-phases');
+        if (phases) {
+          const reading = animate && stage === 1 && phases.dataset.fit === 'scroll';
+          const t = Math.max(0, Math.min(1, (progress - .34) / .26));
+          phases.scrollTop = reading ? t * (phases.scrollHeight - phases.clientHeight) : 0;
+          phases.toggleAttribute('data-end', !reading || t > .98);
+          phases.toggleAttribute('data-scrolled', reading && phases.scrollTop > 2);
+        }
       });
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
@@ -62,6 +74,9 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
       window.removeEventListener('resize', schedule); motion.removeEventListener('change', schedule); observer.disconnect();
     };
   }, [filter, projects]);
+
+  // Long implementation notes must fit the pinned screen, so the progress bar and "next" link stay visible.
+  useEffect(() => watchBoxes(Array.from(root.current?.querySelectorAll<HTMLElement>('.chapter-phases') ?? [])), [filter, projects]);
 
   const goToStage = (id: string, stage: number) => {
     const chapter = document.getElementById(`projeto-${id}`);
@@ -92,8 +107,8 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
               </div>
               <div className="chapter-phases">
                 {/* Everything is read while scrolling: no extra click to reach the details. */}
-                <div className="chapter-phase phase-intro"><span className="phase-kicker">{t.stages[0]}</span><p className="chapter-description">{project.description}</p><span className="phase-scroll"><ArrowDown size={16}/> {t.scrollDetails}</span></div>
-                <div className="chapter-phase phase-description"><span className="phase-kicker">{t.stages[1]}</span><p className="chapter-description">{project.detail || project.description}</p></div>
+                <div className="chapter-phase phase-intro"><span className="phase-kicker">{t.stages[0]}</span><RichText className="chapter-description" text={project.description}/><span className="phase-scroll"><ArrowDown size={16}/> {t.scrollDetails}</span></div>
+                <div className="chapter-phase phase-description"><span className="phase-kicker">{t.stages[1]}</span><RichText className="chapter-description" text={project.detail || project.description}/></div>
                 <div className="chapter-phase phase-technologies"><span className="phase-kicker">{t.stages[2]}</span><div className="chapter-stack"><div className="tags">{project.tags.map((tag, tagIndex) => <span key={tag} style={{ animationDelay: `${tagIndex * 100}ms` }}>{tag}</span>)}</div></div>
                   {(project.live || project.github) && <div className="chapter-links">
                     {project.live && <a className="chapter-link primary" href={project.live} target="_blank" rel="noopener noreferrer">{t.liveProject} <ArrowUpRight size={16}/></a>}
