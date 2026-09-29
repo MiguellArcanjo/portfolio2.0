@@ -57,7 +57,7 @@
 .phase-scroll svg{animation:down 1.8s ease-in-out infinite}
 .phase-technologies .chapter-stack{margin-top:0}.phase-technologies .tags{margin-top:0}
 @media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference){
- .project-chapter,.project-chapter:last-child{min-height:290svh}
+ .project-chapter,.project-chapter:last-child{min-height:calc(290svh + var(--reading-extra,0px))}
  .chapter-steps{display:flex;gap:18px;margin:24px 0 10px;border-bottom:1px solid #24354a}
  .chapter-steps button{display:flex;align-items:center;gap:7px;background:none;padding:12px 0;font-size:11px;color:#71849e;border-bottom:2px solid transparent;transition:color .35s,border-color .35s}
  .chapter-steps button>span{font-family:var(--mono);font-size:9px}

@@ -29,12 +29,17 @@ export function watchFit(cards: HTMLElement[]) {
   return () => observer.disconnect();
 }
 
-// Boxes whose children overlap (the project phases share one grid cell) are measured by scroll height.
+// Boxes whose children overlap (the project phases share one grid cell) are measured by their lowest child.
+// Layout boxes, not scrollHeight: text moved with translate while it is read must not change the result.
+export function boxContentHeight(box: HTMLElement) {
+  return Math.max(0, ...(Array.from(box.children) as HTMLElement[]).map(child => child.offsetTop + child.offsetHeight));
+}
+
 export function fitBox(box: HTMLElement) {
   delete box.dataset.fit;
-  if (box.scrollHeight <= box.clientHeight + 1) return;
+  if (boxContentHeight(box) <= box.clientHeight + 1) return;
   box.dataset.fit = 'dense';
-  if (box.scrollHeight <= box.clientHeight + 1) return;
+  if (boxContentHeight(box) <= box.clientHeight + 1) return;
   box.dataset.fit = 'scroll';
 }
 
