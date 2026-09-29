@@ -5,23 +5,58 @@ import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import type { Project, SiteContent } from '@/lib/content';
 import { ProjectPreview } from './project-preview';
 import { RichText } from './rich-text';
-import { boxContentHeight, watchBoxes } from '@/lib/fit';
+import { watchBoxes } from '@/lib/fit';
 import { useI18n } from '@/lib/i18n';
 
-// Scroll positions (px from the moment the chapter pins) of each stage. Long implementation notes add
-// their own overflow to the chapter height, so they are read at close to the page's scroll speed instead of
-// racing through a fixed window, and the stages after them shift down by the same amount.
+type Pages = { key: string; starts: number[]; items: { el: HTMLElement; top: number; bottom: number }[]; height: number };
+const pageCache = new WeakMap<HTMLElement, Pages>();
+
+// Implementation notes too long for the pinned box are split into pages of whole paragraphs and list items,
+// so the reader never sees a line cut at the edge; the page scroll turns the pages.
+function notePages(phases: HTMLElement, notes: HTMLElement): Pages {
+  const key = `${phases.clientHeight}|${phases.dataset.fit}|${notes.offsetHeight}|${notes.offsetWidth}`;
+  const cached = pageCache.get(notes);
+  if (cached?.key === key) return cached;
+  const text = notes.querySelector<HTMLElement>('.rich-text');
+  const offset = (el: HTMLElement) => { let top = 0; for (let node: HTMLElement | null = el; node && node !== notes; node = node.offsetParent as HTMLElement | null) top += node.offsetTop; return top; };
+  const items = Array.from(text?.querySelectorAll<HTMLElement>(':scope > p, :scope > ul > li') ?? [])
+    .map(el => { const top = offset(el); return { el, top, bottom: top + el.offsetHeight }; });
+  // Room for a page: the box height below the point where the first line starts.
+  const height = phases.clientHeight - notes.offsetTop - (items[0]?.top ?? 0);
+  const starts: number[] = [];
+  if (phases.dataset.fit === 'scroll' && items.length) {
+    let pageStart = items[0].top;
+    starts.push(pageStart);
+    items.forEach((item, i) => {
+      if (item.bottom - pageStart <= height) return;
+      // A heading (paragraph right before a list) moves to the next page together with the list's first item.
+      const previous = items[i - 1];
+      const heading = previous && previous.el.tagName === 'P' && item.el.parentElement?.firstElementChild === item.el && previous.el.nextElementSibling === item.el.parentElement;
+      pageStart = heading && previous.top > pageStart ? previous.top : Math.max(item.top, pageStart + 1);
+      starts.push(pageStart);
+      // A single block taller than the box is shown in overlapping slices.
+      while (item.bottom - pageStart > height) { pageStart += Math.max(40, height - 48); starts.push(pageStart); }
+    });
+  }
+  const pages = { key, starts, items, height };
+  pageCache.set(notes, pages);
+  return pages;
+}
+
+// Scroll positions (px from the moment the chapter pins) of each stage. Every extra page of notes adds its own
+// stretch of scroll to the chapter, and the stages after it shift down by the same amount.
 function chapterGeometry(chapter: HTMLElement, animate: boolean) {
   const pin = chapter.querySelector<HTMLElement>('.chapter-pin')!;
   const phases = chapter.querySelector<HTMLElement>('.chapter-phases');
   const notes = phases?.querySelector<HTMLElement>('.phase-description');
-  const overflow = animate && phases?.dataset.fit === 'scroll' && notes
-    ? Math.round(Math.max(0, notes.offsetTop + notes.offsetHeight - phases.clientHeight)) : 0;
+  const pages = animate && phases && notes ? notePages(phases, notes) : null;
+  const count = Math.max(1, pages?.starts.length ?? 1);
+  const extra = Math.round((count - 1) * Math.max(320, innerHeight * .5));
   const total = Math.max(1, chapter.offsetHeight - pin.offsetHeight);
   const applied = Number(chapter.dataset.readingExtra || 0);
   const base = Math.max(1, total - applied);
-  const readStart = base * .34, readLength = overflow + base * .21;
-  return { phases, notes, overflow, applied, total, readStart, readLength, stage1: base * .3, stage2: readStart + readLength + base * .1, base };
+  const stage1 = base * .3, stage2 = base * .65 + extra;
+  return { notes, pages, count, extra, applied, total, base, stage1, stage2, pageLength: (stage2 - stage1) / count };
 }
 
 export function ProjectShowcase({ projects, heading, onSelect }: { projects: Project[]; heading: SiteContent['projectsSection']; onSelect: (project: Project) => void }) {
@@ -48,9 +83,9 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
         const animate = desktop.matches && !motion.matches;
         const entry = Math.max(0, Math.min(1, (vh - rect.top) / (vh * .7)));
         const geometry = chapterGeometry(chapter, animate);
-        if (geometry.overflow !== geometry.applied) {
-          chapter.dataset.readingExtra = String(geometry.overflow);
-          chapter.style.setProperty('--reading-extra', `${geometry.overflow}px`);
+        if (geometry.extra !== geometry.applied) {
+          chapter.dataset.readingExtra = String(geometry.extra);
+          chapter.style.setProperty('--reading-extra', `${geometry.extra}px`);
           schedule();
         }
         const scrolled = Math.max(0, Math.min(geometry.total, 30 - rect.top));
@@ -70,16 +105,20 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
         chapter.style.setProperty('--chapter-opacity', `${animate ? .2 + entry * .8 : 1}`);
         chapter.style.setProperty('--chapter-scale', `${animate ? .94 + entry * .06 : 1}`);
         chapter.style.setProperty('--chapter-progress', `${progress * 100}%`);
-        // Implementation notes too long for the pinned box are read by scrolling the page itself.
-        // The text keeps its last position while it fades out, so leaving the stage never jumps it back up.
-        const { phases, notes, overflow } = geometry;
-        if (phases && notes) {
-          const t = Math.max(0, Math.min(1, (scrolled - geometry.readStart) / geometry.readLength));
-          const offset = stage === 0 ? 0 : t * overflow;
-          notes.style.translate = offset ? `0 ${-offset}px` : '';
-          const reading = stage === 1 && overflow > 0;
-          phases.toggleAttribute('data-end', !reading || t > .98);
-          phases.toggleAttribute('data-scrolled', reading && offset > 2);
+        // Turning pages: before the stage it shows the first page, after it the last one stays while it fades out.
+        const { notes, pages, count } = geometry;
+        const text = notes?.querySelector<HTMLElement>('.rich-text');
+        const pageIndex = Math.max(0, Math.min(count - 1, Math.floor((scrolled - geometry.stage1) / geometry.pageLength)));
+        if (notes && text) {
+          const page = pages?.starts[pageIndex];
+          text.style.translate = pages && page !== undefined && pageIndex ? `0 ${pages.starts[0] - page}px` : '';
+          pages?.items.forEach(item => {
+            const shown = page === undefined || (item.top >= page - 1 && item.bottom <= page + pages.height + 1)
+              || (item.bottom - item.top > pages.height && item.top < page + pages.height && item.bottom > page);
+            item.el.toggleAttribute('data-off', !shown);
+          });
+          const counter = chapter.querySelector<HTMLElement>('.step-pages');
+          if (counter) counter.textContent = count > 1 ? `${pageIndex + 1}/${count}` : '';
         }
       });
     };
@@ -105,8 +144,8 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
     const chapter = document.getElementById(`projeto-${id}`);
     if (!chapter) return;
     const geometry = chapterGeometry(chapter, chapter.dataset.animated === 'true');
-    // "Implementação" lands on the first line of the notes, not in the middle of the reading.
-    const target = [0, geometry.readStart + 1, geometry.stage2 + geometry.base * .14][stage];
+    // "Implementação" lands on the first page of the notes.
+    const target = [0, geometry.stage1 + 2, geometry.stage2 + geometry.base * .14][stage];
     window.scrollTo({ top: scrollY + chapter.getBoundingClientRect().top - 30 + target, behavior: 'smooth' });
   };
 
@@ -127,7 +166,7 @@ export function ProjectShowcase({ projects, heading, onSelect }: { projects: Pro
               <span className="chapter-category">{project.category}</span>
               <h3 id={`title-${project.id}`}>{project.title}<span>.</span></h3>
               <div className="chapter-steps" role="group" aria-label={t.projectStages(project.title)}>
-                {t.stages.map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}</button>)}
+                {t.stages.map((label, step) => <button key={label} onClick={() => goToStage(project.id, step)}><span>0{step + 1}</span>{label}{step === 1 && <i className="step-pages" aria-hidden="true"/>}</button>)}
               </div>
               <div className="chapter-phases">
                 {/* Everything is read while scrolling: no extra click to reach the details. */}

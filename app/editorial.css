@@ -228,9 +228,11 @@
 @media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
  .portfolio-site .chapter-phases { max-height:max(220px, calc(100svh - 490px - var(--header-space, 0px))); overflow:hidden; }
  .portfolio-site .chapter-phases[data-fit] .chapter-description { font-size:15px; line-height:1.6; }
- .portfolio-site .chapter-phases[data-fit='scroll']:not([data-end]) { -webkit-mask:linear-gradient(#000 calc(100% - 48px),transparent); mask:linear-gradient(#000 calc(100% - 48px),transparent); }
- .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled]:not([data-end]) { -webkit-mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); mask:linear-gradient(transparent,#000 36px,#000 calc(100% - 48px),transparent); }
- .portfolio-site .chapter-phases[data-fit='scroll'][data-scrolled][data-end] { -webkit-mask:linear-gradient(transparent,#000 36px); mask:linear-gradient(transparent,#000 36px); }
+ .portfolio-site .chapter-phases[data-fit='scroll'] .rich-text { transition:translate .6s cubic-bezier(.22,1,.36,1); }
+ .portfolio-site .chapter-phases[data-fit='scroll'] .rich-text :is(p,li) { transition:opacity .35s ease; }
+ .portfolio-site .chapter-phases[data-fit='scroll'] .rich-text [data-off] { opacity:0 !important; visibility:hidden; transition:opacity .35s ease, visibility 0s .35s; }
+ .portfolio-site .step-pages { font-style:normal; font-family:var(--mono); font-size:9px; letter-spacing:.06em; opacity:.65; margin-left:2px; }
+ .portfolio-site .step-pages:empty { display:none; }
 }
 
 /* Portrait cover on phones: the frame follows the image's own proportions instead of cropping it. */
