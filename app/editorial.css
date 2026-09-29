@@ -226,7 +226,9 @@
 
 /* Project phases never push the chapter past the screen: denser text first, inner scroll as a last resort. */
 @media(min-width:901px) and (min-height:700px) and (prefers-reduced-motion:no-preference) {
- .portfolio-site .chapter-phases { max-height:max(220px, calc(100svh - 490px - var(--header-space, 0px))); overflow:hidden; }
+ /* The header's room is always reserved: a box that changed with it would change the page count and the chapter height,
+    and the resulting scroll shift would toggle the header again (an endless shake). */
+ .portfolio-site .chapter-phases { max-height:max(220px, calc(100svh - 580px)); overflow:hidden; }
  .portfolio-site .chapter-phases[data-fit] .chapter-description { font-size:15px; line-height:1.6; }
  .portfolio-site .chapter-phases[data-fit='scroll'] .rich-text { transition:translate .6s cubic-bezier(.22,1,.36,1); }
  .portfolio-site .chapter-phases[data-fit='scroll'] .rich-text :is(p,li) { transition:opacity .35s ease; }
