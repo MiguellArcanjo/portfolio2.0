@@ -11,4 +11,7 @@ export async function revalidateSite() {
   if (!user) throw new Error('Não autenticado.');
   // Every language is refreshed: untranslated languages derive their content from Portuguese.
   locales.forEach(locale => revalidatePath(localePath(locale)));
+  revalidatePath('/projetos/[id]', 'page');
+  revalidatePath('/en/projetos/[id]', 'page');
+  revalidatePath('/es/projetos/[id]', 'page');
 }

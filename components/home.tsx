@@ -1,25 +1,22 @@
 'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpRight, ArrowDown, Menu, X, Check, Copy } from 'lucide-react';
+import Link from 'next/link';
+import { ProjectCover } from './project-cover';
+import { projectPath } from '@/lib/project-path';
 
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowDown, GitFork as Github, ContactRound as Linkedin, Mail, Menu, X, Check, Copy } from 'lucide-react';
-import { Orbit } from '@/components/orbit';
-import { Toolkit } from '@/components/toolkit';
-import { Experience } from '@/components/experience';
-import { About } from '@/components/about';
-import { ProjectPreview } from '@/components/project-preview';
-import { ProjectShowcase } from '@/components/project-showcase';
-import type { Project, SiteContent } from '@/lib/content';
-import { PortraitIntro } from '@/components/portrait-intro';
-import { RichText } from '@/components/rich-text';
+import { RichText } from './rich-text';
+import { DrawnName } from './drawn-name';
+import { FolioAbout } from './folio-about';
+import { FolioStack } from './folio-stack';
+import { FolioExperience } from './folio-experience';
+import type { SiteContent } from '@/lib/content';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
-
-const lines = (text: string) => text.split('\n').map((line, index) => <Fragment key={index}>{index > 0 && <br/>}{line}</Fragment>);
 
 export function Home({ content, locale }: { content: SiteContent; locale: Locale }) {
   return <I18nProvider locale={locale}><Site content={content}/></I18nProvider>;
 }
-
 // Keeps the reader on the same section when switching language.
 function LanguageSwitch({ className = '', label }: { className?: string; label?: string }) {
   const { locale, t } = useI18n();
@@ -36,76 +33,89 @@ function LanguageSwitch({ className = '', label }: { className?: string; label?:
 
 function Site({ content }: { content: SiteContent }) {
   const { locale, t } = useI18n();
-  const { profile } = content;
+  const { profile, about, toolkit, experience } = content;
   const [menu, setMenu] = useState(false);
-  const [selected, setSelected] = useState<Project | null>(null);
+  const [filter, setFilter] = useState('');
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const header = useRef<HTMLElement>(null);
-
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const categories = [...new Set(content.projects.map(project => project.category).filter(Boolean))];
+  const projects = useMemo(() => content.projects.filter(project => !filter || project.category === filter), [content.projects, filter]);
   useEffect(() => { document.documentElement.lang = localeLabels[locale].html; }, [locale]);
-
-  // Header hides while reading downwards and comes back (pinned, with a backdrop) as soon as the reader scrolls up.
   useEffect(() => {
-    const bar = header.current;
-    if (!bar) return;
-    let last = scrollY, frame = 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('section-arrived'); observer.unobserve(entry.target); }
+    }), { threshold: .25 });
+    document.querySelectorAll('.folio-section h2').forEach(title => observer.observe(title));
+    return () => observer.disconnect();
+  }, []);
+  // Covers open like a curtain the first time they enter the screen, then drift slightly against the scroll.
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const covers = Array.from(document.querySelectorAll<HTMLElement>('.work-cover'));
+    const visible = new Set<HTMLElement>();
+    let frame = 0;
     const update = () => {
       frame = 0;
-      const y = scrollY, delta = y - last;
-      if (y < 90) bar.dataset.state = 'top';
-      else if (delta > 6) bar.dataset.state = 'hidden';
-      else if (delta < -6) bar.dataset.state = 'pinned';
-      if (Math.abs(delta) > 6 || y < 90) last = y;
+      visible.forEach(cover => {
+        const rect = cover.getBoundingClientRect();
+        const center = (rect.top + rect.height / 2 - innerHeight / 2) / innerHeight;
+        cover.style.setProperty('--drift', `${Math.max(-1, Math.min(1, center)) * -3}%`);
+      });
     };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    // Landing mid-page (a #link or a reload) shows the bar with its backdrop instead of floating over content.
-    bar.dataset.state = scrollY < 90 ? 'top' : 'pinned';
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
-  }, []);
-
-  useEffect(() => {
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const observer = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }); }, { threshold: .08 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    const offscreen = new IntersectionObserver(entries => entries.forEach(e => e.target.toggleAttribute('data-offscreen', !e.isIntersecting)), { rootMargin: '10% 0px' });
-    document.querySelectorAll('main > section').forEach(el => offscreen.observe(el));
-    const pointer = (e: PointerEvent) => { if(reduced.matches) return; document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`); document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`); };
-    window.addEventListener('pointermove', pointer, { passive: true });
-    return () => { observer.disconnect(); offscreen.disconnect(); window.removeEventListener('pointermove', pointer); };
-  }, []);
-
-  useEffect(() => {
-    if (selected) { dialog.current?.showModal(); const previous = document.body.style.overflow; document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = previous; }; }
-    dialog.current?.close();
-  }, [selected]);
-
-  const copyEmail = async () => { if(!profile.email) return; try { await navigator.clipboard.writeText(profile.email); setCopied(true); setCopyError(false); setTimeout(()=>setCopied(false), 2500); } catch { setCopyError(true); } };
-  const [heroTitle, heroAccent] = [content.hero.title.split('\n'), content.hero.accent.split('\n')];
-  const navItems: [string, string][] = [[t.nav.about, 'sobre'], [t.nav.projects, 'projetos'], [t.nav.stack, 'stack'], [t.nav.experience, 'experiencia']];
-
-  return <div className="portfolio-site">
-    <div className="mouse-glow" aria-hidden="true"/>
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const cover = entry.target as HTMLElement;
+        if (entry.isIntersecting) { visible.add(cover); if (entry.intersectionRatio > .2) cover.setAttribute('data-shown', ''); }
+        else visible.delete(cover);
+      });
+      schedule();
+    }, { threshold: [0, .2] });
+    covers.forEach(cover => { cover.setAttribute('data-motion', ''); observer.observe(cover); });
+    addEventListener('scroll', schedule, { passive: true });
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); removeEventListener('scroll', schedule); };
+  }, [projects]);
+  const copyEmail = async () => {
+    try { await navigator.clipboard.writeText(profile.email); setCopied(true); setCopyError(false); }
+    catch { setCopyError(true); }
+  };
+  const navItems = [[t.nav.projects, 'projetos'], [t.nav.about, 'sobre'], [t.nav.stack, 'stack'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
+  return <div className="folio">
     <a className="skip-link" href="#main">{t.skip}</a>
-    <header className="header" ref={header} data-state="top" data-menu={menu || undefined}><a href="#" className="logo" aria-label={t.home}>{profile.initials}<span>.</span></a><nav aria-label={t.mainNav} className={menu?'nav open':'nav'}>{navItems.map(([label,id])=><a href={`#${id}`} key={id} onClick={()=>setMenu(false)}>{label}</a>)}</nav><LanguageSwitch/><a className="header-contact" href="#contato">{t.contact} <ArrowUpRight size={16}/></a><button className="menu-toggle" onClick={()=>setMenu(!menu)} aria-label={menu?t.closeMenu:t.openMenu} aria-expanded={menu}>{menu?<X/>:<Menu/>}</button></header>
-    <main id="main">
-      <PortraitIntro profile={profile}/>
-      <section id="inicio" className="hero container">
-        <div className="hero-identity"><span>{profile.name}</span><span>{profile.role}</span></div>
-        <div className="hero-content"><h1>{heroTitle.map((line, index) => <span className="hero-title-line" key={index}>{line}</span>)}<span className="hero-title-accent">{heroAccent.join(' ')}</span></h1></div>
-        <div className="hero-art"><Orbit/></div>
-        <div className="hero-intro"><p>{lines(content.hero.text)}</p><a href="#projetos" className="hero-project-link">{t.seeProjects} <ArrowDown size={23}/></a></div>
-        <a href="#sobre" className="hero-about-link">{t.moreAboutMe} <ArrowUpRight size={17}/></a>
+    <header className="folio-header folio-width">
+      <a className="folio-brand" href="#inicio" aria-label={t.home}>{profile.initials}<span>.</span></a>
+      <nav className={`folio-nav ${menu ? 'is-open' : ''}`} aria-label={t.mainNav}>{navItems.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>)}<a href="#contato" onClick={() => setMenu(false)}>{t.contact}</a></nav>
+      <LanguageSwitch/>
+      <button className="folio-menu" onClick={() => setMenu(!menu)} aria-label={menu ? t.closeMenu : t.openMenu} aria-expanded={menu}>{menu ? <X/> : <Menu/>}</button>
+    </header>
+    <main id="main" className="folio-width">
+
+      <section id="inicio" className="folio-hero">
+        <div className="hero-heading"><p className="folio-role">{profile.role}</p><DrawnName name={profile.name}/></div>
+        <div className="hero-bottom-grid">
+          <div className="hero-description"><RichText text={content.hero.text}/><a className="hero-project-link" href="#projetos">{t.seeProjects}<ArrowDown size={22}/></a></div>
+          <div className="folio-portrait">{profile.photo && !photoFailed ? <img src={profile.photo} alt={profile.photoAlt} style={{ objectPosition: profile.photoPosition }} onError={() => setPhotoFailed(true)} fetchPriority="high"/> : <span aria-hidden="true">{profile.initials}</span>}</div>
+          <div className="hero-side"><span>{profile.status}</span><div>{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={17}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ArrowUpRight size={17}/></a>}</div></div>
+        </div>
       </section>
-      <About profile={profile} about={content.about}/>
-      <ProjectShowcase projects={content.projects} heading={content.projectsSection} onSelect={setSelected}/>
-      <Toolkit content={content.toolkit}/>
-      <Experience content={content.experience}/>
-      <section id="contato" className="contact-section reveal"><div className="container"><div className="section-label"><span>04 /</span> {t.labels.contact}</div><div className="contact-layout"><h2>{lines(content.contact.title)} <span>{content.contact.accent}</span></h2><a className="contact-arrow" href={profile.email?`mailto:${profile.email}`:'#contact-details'} aria-label={t.seeContact}><ArrowUpRight/></a></div><div className="contact-bottom" id="contact-details"><p>{lines(content.contact.text)}</p>{profile.email?<div className="email-group"><a href={`mailto:${profile.email}`}>{profile.email}</a><button onClick={copyEmail} aria-label={t.copyEmail}>{copied?<Check size={18}/>:<Copy size={18}/>}</button><span role="status">{copied?t.copied:copyError?t.copyFallback:''}</span></div>:<div className="contact-placeholder"><Mail size={19}/><span>{t.emailPlaceholder}<small>{t.emailPending}</small></span></div>}</div></div></section>
+      <section id="projetos" className="folio-section folio-work">
+        <div className="folio-section-head"><div><p className="folio-role">01 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
+        <div className="work-gallery">{projects.map((project,index) => <Link className="work-item" key={project.id} href={projectPath(locale,project.id)}>
+          {/* The "open" badge follows the pointer over the cover. */}
+          <div className="work-cover" onPointerMove={event => { const rect = event.currentTarget.getBoundingClientRect(); event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`); event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`); }}><ProjectCover project={project}/><span className="work-open"><span>{t.openProject}</span><ArrowUpRight size={18}/></span></div>
+          <div className="work-heading"><span className="work-index">{String(index+1).padStart(2,'0')}</span><h3>{project.title}</h3><span className="work-category">{project.category}</span><ArrowUpRight size={25}/></div>
+          <p className="work-description">{project.description}</p>
+          {project.tags.length > 0 && <ul className="work-tags">{project.tags.slice(0,5).map(tag => <li key={tag}>{tag}</li>)}{project.tags.length > 5 && <li>+{project.tags.length - 5}</li>}</ul>}
+        </Link>)}</div>
+      </section>
+      <FolioAbout about={about} label={t.nav.about}/>
+      <FolioStack toolkit={toolkit} label={t.nav.stack}/>
+      <FolioExperience experience={experience} label={t.nav.experience}/>
+      <section id="contato" className="folio-section folio-contact"><div><p className="folio-role">{t.contact}</p><h2>{content.contact.title}<br/><span>{content.contact.accent}</span></h2><RichText text={content.contact.text}/></div><div className="folio-contact-links">{profile.email ? <><a className="folio-email" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={22}/></a><button onClick={copyEmail}>{copied ? <Check size={15}/> : <Copy size={15}/>} {copied ? t.copied : t.copyEmail}</button><span role="status">{copyError ? t.copyFallback : ''}</span></> : <span>{t.emailPlaceholder}</span>}{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={16}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <ArrowUpRight size={16}/></a>}</div></section>
     </main>
-    <footer className="container footer"><a href="#" className="logo">{profile.initials}<span>.</span></a><span>{t.footer}</span><LanguageSwitch className="in-footer" label={t.languageFooter}/><div className="socials">{profile.github&&<a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Github size={18}/></a>}{profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Linkedin size={18}/></a>}<a href="#" aria-label={t.backToTop}>{t.backToTop} <ArrowUpRight size={15}/></a></div></footer>
-    <dialog ref={dialog} className="project-dialog" onCancel={()=>setSelected(null)} onClick={e=>{if(e.target===e.currentTarget)setSelected(null);}} aria-labelledby="dialog-title"><button className="dialog-close" onClick={()=>setSelected(null)} aria-label={t.closeDetails}><X size={22}/></button>{selected&&<><ProjectPreview kind={selected.kind} image={selected.image} imageMobile={selected.imageMobile} alt={t.coverOf(selected.title)} placeholder={selected.description.startsWith('[')}/><div className="dialog-content"><div className="section-label">{t.project.toUpperCase()} / {selected.type}</div><h2 id="dialog-title">{selected.title}</h2><RichText text={selected.description}/><RichText text={selected.detail}/><div className="tags">{selected.tags.map(tag=><span key={tag}>{tag}</span>)}</div>{selected.github&&<a href={selected.github}>{t.seeRepository} <ArrowUpRight size={16}/></a>}{selected.live&&<a href={selected.live}>{t.openProject} <ArrowUpRight size={16}/></a>}</div></>}</dialog>
+    <footer className="folio-footer folio-width"><span>{profile.name}</span><a href="#inicio">{t.backToTop}<ArrowUpRight size={15}/></a></footer>
+
   </div>;
 }
