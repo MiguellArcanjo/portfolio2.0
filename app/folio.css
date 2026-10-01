@@ -298,3 +298,60 @@
  .folio-footer-big{padding-top:50px}.footer-name{margin-top:55px}
  .footer-bottom{flex-direction:column}
 }
+
+/* Top bar (components/folio-header.tsx): fixed, hides while reading down, returns compact with a backdrop. */
+.folio{--header-space:0px}
+.folio:has(.folio-topbar[data-state=pinned]){--header-space:70px}
+.topbar-space{height:100px}
+.folio-topbar{position:fixed;top:0;left:0;right:0;z-index:40;transition:transform .5s cubic-bezier(.22,1,.36,1),background .4s,box-shadow .4s}
+.folio-topbar .folio-header{height:100px;transition:height .45s cubic-bezier(.22,1,.36,1),border-color .4s}
+.folio-topbar[data-state=hidden]:not(:focus-within){transform:translateY(-100%)}
+.folio-topbar[data-state=pinned]{background:#121416db;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 1px 0 var(--border)}
+.folio-topbar[data-state=pinned] .folio-header{height:70px;border-bottom-color:transparent}
+.topbar-progress{position:absolute;left:0;bottom:-1px;width:100%;height:1px;background:var(--accent);transform-origin:left;transform:scaleX(var(--read,0));opacity:0;transition:opacity .4s}
+.folio-topbar[data-state=pinned] .topbar-progress{opacity:1}
+.folio-topbar .folio-brand span{display:inline-block;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.folio-topbar .folio-brand:hover span{transform:translateY(-7px)}
+.folio-topbar .folio-nav{position:relative;gap:30px}
+.folio .folio-topbar .folio-nav a{color:#a9acaf;padding:9px 0}
+.folio .folio-topbar .folio-nav a:hover,.folio .folio-topbar .folio-nav a[aria-current]{color:var(--fg)}
+.nav-indicator{position:absolute;left:0;bottom:0;width:var(--w,0);height:1px;background:var(--accent);transform:translateX(var(--x,0));opacity:0;transition:transform .55s cubic-bezier(.22,1,.36,1),width .55s cubic-bezier(.22,1,.36,1),opacity .3s}
+.folio-nav[data-indicator] .nav-indicator{opacity:1}
+.roll{position:relative;display:inline-block;overflow:hidden;vertical-align:top;line-height:1.3}
+.roll>span{display:block;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.roll:after{content:attr(data-text) / "";position:absolute;left:0;top:100%;white-space:nowrap;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visible>.roll:after{transform:translateY(-100%)}
+.folio .topbar-cta{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border:1px solid #4a4e53;border-radius:99px;font-size:13px;transition:background .35s,color .35s,border-color .35s}
+.folio .topbar-cta:hover,.folio .topbar-cta[aria-current]{background:var(--fg);border-color:var(--fg);color:#111}
+.topbar-cta svg{transition:transform .5s cubic-bezier(.22,1,.36,1)}.topbar-cta:hover svg{transform:rotate(45deg)}
+.folio .folio-topbar .folio-menu{display:none;position:relative;width:44px;height:44px;border-radius:50%;border:1px solid #4a4e53;padding:0;flex:none}
+.folio-menu i{position:absolute;left:13px;right:13px;height:1.5px;background:var(--fg);transition:transform .45s cubic-bezier(.22,1,.36,1),top .45s cubic-bezier(.22,1,.36,1)}
+.folio-menu i:first-child{top:17px}.folio-menu i:last-child{top:25px}
+.folio-topbar[data-open] .folio-menu i{top:21px}
+.folio-topbar[data-open] .folio-menu i:first-child{transform:rotate(45deg)}.folio-topbar[data-open] .folio-menu i:last-child{transform:rotate(-45deg)}
+.folio-topbar[data-open]{background:var(--bg);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.folio-overlay{display:none}
+/* Sticky blocks move down while the bar is showing, so it never covers them. */
+.about-head,.stack-panel,.xp-when,.case-body aside{top:calc(40px + var(--header-space));transition:top .45s cubic-bezier(.22,1,.36,1)}
+@media(max-width:1000px){.folio-topbar .folio-nav{gap:20px}}
+@media(max-width:650px){
+ .topbar-space{height:78px}
+ .folio-topbar .folio-header{height:78px}
+ .folio-topbar[data-state=pinned] .folio-header{height:64px}
+ .folio:has(.folio-topbar[data-state=pinned]){--header-space:64px}
+ .folio-topbar .folio-nav,.folio .topbar-cta{display:none}
+ .folio .folio-topbar .folio-menu{display:block}
+ .folio-overlay{position:fixed;inset:0;z-index:39;display:flex;flex-direction:column;justify-content:space-between;gap:30px;padding:100px 20px 32px;background:var(--bg);clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .7s cubic-bezier(.77,0,.18,1),visibility 0s .7s}
+ .folio-overlay[data-open]{clip-path:inset(0);visibility:visible;transition:clip-path .7s cubic-bezier(.77,0,.18,1),visibility 0s}
+ .folio-overlay nav{display:flex;flex-direction:column}
+ .folio-overlay nav a{display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);font-size:clamp(36px,11vw,58px);letter-spacing:-.05em;line-height:1.1;opacity:0;transform:translateY(34px);transition:opacity .4s,transform .7s cubic-bezier(.22,1,.36,1)}
+ .folio-overlay[data-open] nav a{opacity:1;transform:none;transition-delay:calc(.2s + var(--i) * 60ms)}
+ .folio-overlay nav a small{font-family:var(--mono);font-size:11px;letter-spacing:0;color:var(--muted)}
+ .folio .folio-overlay nav a[aria-current]{color:var(--accent)}
+ .overlay-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);opacity:0;transition:opacity .5s}
+ .folio-overlay[data-open] .overlay-foot{opacity:1;transition-delay:.5s}
+ .folio .lang-switch.in-overlay a{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.folio-topbar,.folio-overlay,.folio-overlay nav a{transition:none}}
+.folio .lang-switch.in-overlay{flex-direction:row;gap:16px}
+.folio-topbar[data-open] .topbar-progress{opacity:0}

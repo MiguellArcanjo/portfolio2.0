@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, ArrowDown, Menu, X } from 'lucide-react';
+import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 import { ProjectCover } from './project-cover';
 import { projectPath } from '@/lib/project-path';
@@ -11,6 +11,7 @@ import { FolioAbout } from './folio-about';
 import { FolioStack } from './folio-stack';
 import { FolioExperience } from './folio-experience';
 import { FolioContact, FolioFooter } from './folio-contact';
+import { FolioHeader } from './folio-header';
 import type { SiteContent } from '@/lib/content';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
@@ -35,7 +36,6 @@ function LanguageSwitch({ className = '', label }: { className?: string; label?:
 function Site({ content }: { content: SiteContent }) {
   const { locale, t } = useI18n();
   const { profile, about, toolkit, experience } = content;
-  const [menu, setMenu] = useState(false);
   const [filter, setFilter] = useState('');
   const [photoFailed, setPhotoFailed] = useState(false);
   const categories = [...new Set(content.projects.map(project => project.category).filter(Boolean))];
@@ -79,12 +79,7 @@ function Site({ content }: { content: SiteContent }) {
   const navItems = [[t.nav.projects, 'projetos'], [t.nav.about, 'sobre'], [t.nav.stack, 'stack'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
   return <div className="folio">
     <a className="skip-link" href="#main">{t.skip}</a>
-    <header className="folio-header folio-width">
-      <a className="folio-brand" href="#inicio" aria-label={t.home}>{profile.initials}<span>.</span></a>
-      <nav className={`folio-nav ${menu ? 'is-open' : ''}`} aria-label={t.mainNav}>{navItems.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>)}<a href="#contato" onClick={() => setMenu(false)}>{t.contact}</a></nav>
-      <LanguageSwitch/>
-      <button className="folio-menu" onClick={() => setMenu(!menu)} aria-label={menu ? t.closeMenu : t.openMenu} aria-expanded={menu}>{menu ? <X/> : <Menu/>}</button>
-    </header>
+    <FolioHeader profile={profile} nav={navItems as [string, string][]} contactLabel={t.contact} languages={<LanguageSwitch/>} mobileLanguages={<LanguageSwitch className="in-overlay"/>}/>
     <main id="main" className="folio-width">
 
       <section id="inicio" className="folio-hero">
