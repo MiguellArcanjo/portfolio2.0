@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, ArrowDown, Menu, X, Check, Copy } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { ProjectCover } from './project-cover';
 import { projectPath } from '@/lib/project-path';
@@ -10,6 +10,7 @@ import { DrawnName } from './drawn-name';
 import { FolioAbout } from './folio-about';
 import { FolioStack } from './folio-stack';
 import { FolioExperience } from './folio-experience';
+import { FolioContact, FolioFooter } from './folio-contact';
 import type { SiteContent } from '@/lib/content';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
@@ -36,8 +37,6 @@ function Site({ content }: { content: SiteContent }) {
   const { profile, about, toolkit, experience } = content;
   const [menu, setMenu] = useState(false);
   const [filter, setFilter] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState(false);
   const [photoFailed, setPhotoFailed] = useState(false);
   const categories = [...new Set(content.projects.map(project => project.category).filter(Boolean))];
   const projects = useMemo(() => content.projects.filter(project => !filter || project.category === filter), [content.projects, filter]);
@@ -77,10 +76,6 @@ function Site({ content }: { content: SiteContent }) {
     addEventListener('scroll', schedule, { passive: true });
     return () => { cancelAnimationFrame(frame); observer.disconnect(); removeEventListener('scroll', schedule); };
   }, [projects]);
-  const copyEmail = async () => {
-    try { await navigator.clipboard.writeText(profile.email); setCopied(true); setCopyError(false); }
-    catch { setCopyError(true); }
-  };
   const navItems = [[t.nav.projects, 'projetos'], [t.nav.about, 'sobre'], [t.nav.stack, 'stack'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
   return <div className="folio">
     <a className="skip-link" href="#main">{t.skip}</a>
@@ -113,9 +108,9 @@ function Site({ content }: { content: SiteContent }) {
       <FolioAbout about={about} label={t.nav.about}/>
       <FolioStack toolkit={toolkit} label={t.nav.stack}/>
       <FolioExperience experience={experience} label={t.nav.experience}/>
-      <section id="contato" className="folio-section folio-contact"><div><p className="folio-role">{t.contact}</p><h2>{content.contact.title}<br/><span>{content.contact.accent}</span></h2><RichText text={content.contact.text}/></div><div className="folio-contact-links">{profile.email ? <><a className="folio-email" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={22}/></a><button onClick={copyEmail}>{copied ? <Check size={15}/> : <Copy size={15}/>} {copied ? t.copied : t.copyEmail}</button><span role="status">{copyError ? t.copyFallback : ''}</span></> : <span>{t.emailPlaceholder}</span>}{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={16}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <ArrowUpRight size={16}/></a>}</div></section>
+      <FolioContact content={content} label={t.contact}/>
     </main>
-    <footer className="folio-footer folio-width"><span>{profile.name}</span><a href="#inicio">{t.backToTop}<ArrowUpRight size={15}/></a></footer>
+    <FolioFooter content={content} nav={[...navItems, [t.contact, 'contato']] as [string, string][]} languages={<LanguageSwitch className="in-footer" label={t.languageFooter}/>}/>
 
   </div>;
 }

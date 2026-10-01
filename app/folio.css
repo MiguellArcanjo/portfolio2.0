@@ -232,3 +232,69 @@
  .xp-summary{gap:30px}.xp-summary .rich-text{display:none}
  .case-story .rich-text p:has(+ul){font-size:17px;margin-top:34px}
 }
+
+/* Contact (components/folio-contact.tsx): a large call, the e-mail as the main action, channels as cards. */
+.folio .folio-contact{display:block;padding-bottom:100px}
+.folio .contact-title{font-size:clamp(48px,8.6vw,138px);line-height:.98;letter-spacing:-.065em;margin:28px 0 70px}
+.contact-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:80px;align-items:start;border-top:1px solid var(--border);padding-top:44px}
+.folio .contact-lead .rich-text{font-size:16px;max-width:360px}
+.contact-time{margin-top:34px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.contact-time:before{content:'';width:7px;height:7px;border-radius:50%;background:#86e0ad;box-shadow:0 0 10px #86e0ad}
+.contact-time span,.footer-bottom span span{color:var(--fg);letter-spacing:.02em}.contact-time small,.footer-bottom small{color:var(--muted)}
+.folio .contact-email{position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;padding-bottom:26px;border-bottom:1px solid #4a4e53}
+.contact-email>span{font-size:clamp(22px,2.5vw,38px);letter-spacing:-.04em;overflow-wrap:break-word;min-width:0;color:transparent;background:linear-gradient(var(--accent),var(--accent)) left/0% 100% no-repeat,linear-gradient(var(--fg),var(--fg));-webkit-background-clip:text;background-clip:text;transition:background-size .8s cubic-bezier(.22,1,.36,1)}
+.contact-email:hover>span,.contact-email:focus-visible>span{background-size:100% 100%,100% 100%}
+.contact-email i{flex:none;width:68px;height:68px;border-radius:50%;border:1px solid #4a4e53;display:grid;place-items:center;color:var(--fg);transition:background .4s,color .4s,border-color .4s,transform .6s cubic-bezier(.22,1,.36,1)}
+.contact-email:hover i,.contact-email:focus-visible i{background:var(--fg);border-color:var(--fg);color:#111;transform:rotate(45deg)}
+.contact-email:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.22,1,.36,1)}
+.contact-email:hover:after{transform:scaleX(1)}
+.folio .contact-copy{margin-top:18px;display:inline-flex;gap:10px;align-items:center;font-size:12px;color:var(--muted);padding:9px 15px;border:1px solid var(--border);border-radius:99px;transition:border-color .3s,color .3s}
+.folio .contact-copy:hover{border-color:var(--fg);color:var(--fg)}
+.contact-status{display:block;min-height:1em;margin-top:8px;font-size:12px;color:var(--muted)}
+.contact-channels{list-style:none;padding:0;margin-top:34px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.folio .contact-channels a{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:22px;border:1px solid var(--border);transition:border-color .4s}
+.contact-channels a:before{content:'';position:absolute;inset:0;z-index:-1;background:var(--fg);transform:translateY(101%);transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.contact-channel-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .4s}
+.contact-channels strong{font-weight:500;font-size:17px;color:var(--fg);overflow-wrap:anywhere;transition:color .4s}
+.contact-channels svg{grid-column:2;grid-row:1/3;align-self:center;color:var(--fg);transition:transform .6s cubic-bezier(.22,1,.36,1),color .4s}
+.folio .contact-channels a:hover{border-color:var(--fg)}
+.contact-channels a:hover:before,.contact-channels a:focus-visible:before{transform:none}
+.contact-channels a:hover :is(.contact-channel-label,strong,svg),.contact-channels a:focus-visible :is(.contact-channel-label,strong,svg){color:#111}
+.contact-channels a:hover svg{transform:rotate(45deg)}
+
+/* Footer: link columns, back-to-top, the name filling the width and a closing line. */
+.folio-footer-big{border-top:1px solid var(--border);padding-top:70px;overflow:hidden}
+.footer-columns{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:40px;align-items:start}
+.footer-columns>nav,.footer-columns>div{display:flex;flex-direction:column;align-items:flex-start;gap:12px;font-size:14px}
+.footer-brand p{margin-top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);max-width:230px;line-height:1.8}
+.footer-heading{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.footer-columns>nav a,.footer-columns>div>a{transition:transform .4s cubic-bezier(.22,1,.36,1),color .25s}
+.footer-columns>nav a:hover,.footer-columns>div>a:not(.folio-brand):hover{transform:translateX(6px)}
+.folio-footer-big .lang-switch{gap:14px}.folio-footer-big .lang-switch a{font-size:12px}
+.folio .footer-top{width:64px;height:64px;border-radius:50%;border:1px solid #4a4e53;display:grid;place-items:center;transition:background .4s,color .4s,border-color .4s}
+.folio .footer-top:hover{background:var(--fg);border-color:var(--fg);color:#111}
+.footer-top:hover svg{animation:footer-up .7s cubic-bezier(.22,1,.36,1)}
+@keyframes footer-up{45%{transform:translateY(-140%)}46%{transform:translateY(140%)}}
+.footer-name{margin:80px 0 0;line-height:.82;white-space:nowrap;font-weight:500;letter-spacing:-.065em;color:transparent;-webkit-text-stroke:1px #45494e;user-select:none;padding-bottom:.2em;transition:color .8s}
+.footer-name span{display:inline-block}
+.footer-name:hover{color:#1d2024}
+.footer-bottom{display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:26px 0 34px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+@media(prefers-reduced-motion:no-preference){
+ @supports (animation-timeline:view()){
+  .footer-name span{animation:footer-name linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+  .contact-channels li,.contact-email{animation:folio-enter linear both;animation-timeline:view();animation-range:entry 0% entry 60%}
+ }
+}
+@keyframes footer-name{from{transform:translateY(55%);opacity:0}}
+@media(max-width:1000px){
+ .contact-grid{grid-template-columns:minmax(0,1fr);gap:40px}
+ .footer-columns{grid-template-columns:1fr 1fr;gap:36px 24px}.footer-brand{grid-column:1/-1}
+ .footer-top{grid-column:2;justify-self:end}
+}
+@media(max-width:650px){
+ .folio .contact-title{margin:22px 0 40px}
+ .contact-channels{grid-template-columns:1fr}
+ .contact-email i{width:52px;height:52px}
+ .folio-footer-big{padding-top:50px}.footer-name{margin-top:55px}
+ .footer-bottom{flex-direction:column}
+}
