@@ -67,23 +67,40 @@ export function FolioContact({ content, label }: { content: SiteContent; label: 
   </section>;
 }
 
-// The name is sized to fill the footer's width exactly, whatever its length.
+// The name as a neon sign: the tube draws itself when the footer arrives, flickers on, and then sparks of
+// light keep running along every letter. The SVG viewBox is cut to the text, so it fills the width at any length.
 function FooterName({ name }: { name: string }) {
-  const box = useRef<HTMLParagraphElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const svg = useRef<SVGSVGElement>(null);
+  const [viewBox, setViewBox] = useState('0 0 1000 120');
+  useEffect(() => {
+    const fit = () => {
+      const text = svg.current?.querySelector('text');
+      if (!text) return;
+      const b = text.getBBox();
+      const pad = 8;
+      setViewBox(`${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`);
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+  }, [name]);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () => {
-      el.style.fontSize = '100px';
-      const text = el.firstElementChild as HTMLElement;
-      el.style.fontSize = `${Math.min(260, 100 * el.clientWidth / Math.max(1, text.scrollWidth))}px`;
-    };
-    const observer = new ResizeObserver(fit);
+    // Lights up once; the running light only animates while the sign is on screen.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio > .35) el.setAttribute('data-lit', '');
+      el.toggleAttribute('data-running', entry.isIntersecting);
+    }, { threshold: [0, .35] });
     observer.observe(el);
-    document.fonts?.ready.then(fit);
     return () => observer.disconnect();
-  }, [name]);
-  return <p className="footer-name" ref={box} aria-hidden="true"><span>{name}</span></p>;
+  }, []);
+  const layer = (className: string) => <text className={className} x="0" y="100">{name}</text>;
+  return <div className="footer-neon" ref={box} aria-hidden="true">
+    <svg ref={svg} viewBox={viewBox} preserveAspectRatio="xMinYMid meet">
+      {layer('neon-tube')}{layer('neon-light')}{layer('neon-spark')}
+    </svg>
+  </div>;
 }
 
 export function FolioFooter({ content, nav, languages }: { content: SiteContent; nav: [string, string][]; languages: ReactNode }) {

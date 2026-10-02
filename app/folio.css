@@ -275,17 +275,12 @@
 .folio .footer-top:hover{background:var(--fg);border-color:var(--fg);color:#111}
 .footer-top:hover svg{animation:footer-up .7s cubic-bezier(.22,1,.36,1)}
 @keyframes footer-up{45%{transform:translateY(-140%)}46%{transform:translateY(140%)}}
-.footer-name{margin:80px 0 0;line-height:.82;white-space:nowrap;font-weight:500;letter-spacing:-.065em;color:transparent;-webkit-text-stroke:1px #45494e;user-select:none;padding-bottom:.2em;transition:color .8s}
-.footer-name span{display:inline-block}
-.footer-name:hover{color:#1d2024}
 .footer-bottom{display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:26px 0 34px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
 @media(prefers-reduced-motion:no-preference){
  @supports (animation-timeline:view()){
-  .footer-name span{animation:footer-name linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
   .contact-channels li,.contact-email{animation:folio-enter linear both;animation-timeline:view();animation-range:entry 0% entry 60%}
  }
 }
-@keyframes footer-name{from{transform:translateY(55%);opacity:0}}
 @media(max-width:1000px){
  .contact-grid{grid-template-columns:minmax(0,1fr);gap:40px}
  .footer-columns{grid-template-columns:1fr 1fr;gap:36px 24px}.footer-brand{grid-column:1/-1}
@@ -295,7 +290,7 @@
  .folio .contact-title{margin:22px 0 40px}
  .contact-channels{grid-template-columns:1fr}
  .contact-email i{width:52px;height:52px}
- .folio-footer-big{padding-top:50px}.footer-name{margin-top:55px}
+ .folio-footer-big{padding-top:50px}
  .footer-bottom{flex-direction:column}
 }
 
@@ -355,3 +350,21 @@ a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visibl
 @media(prefers-reduced-motion:reduce){.folio-topbar,.folio-overlay,.folio-overlay nav a{transition:none}}
 .folio .lang-switch.in-overlay{flex-direction:row;gap:16px}
 .folio-topbar[data-open] .topbar-progress{opacity:0}
+/* Footer name as a neon sign (FooterName in components/folio-contact.tsx). */
+.footer-neon{margin:80px 0 10px;--neon:var(--accent)}
+.footer-neon svg{display:block;width:100%;height:auto;overflow:visible}
+.footer-neon text{font-family:var(--font-dm-sans),sans-serif;font-size:100px;font-weight:500;letter-spacing:-.065em;fill:none;stroke-linejoin:round;stroke-linecap:round}
+.neon-tube{stroke:#9baeff1c;stroke-width:1.2;transition:stroke .6s}
+.neon-light{stroke:var(--neon);stroke-width:1.7;stroke-dasharray:600;stroke-dashoffset:600;opacity:.55;filter:drop-shadow(0 0 2px var(--neon)) drop-shadow(0 0 10px color-mix(in srgb,var(--neon) 65%,transparent))}
+.neon-spark{stroke:#f3f5ff;stroke-width:2.2;stroke-dasharray:16 300;opacity:0;filter:drop-shadow(0 0 3px var(--neon)) drop-shadow(0 0 9px var(--neon))}
+.footer-neon[data-lit] .neon-light{animation:neon-draw 2.6s cubic-bezier(.65,0,.35,1) forwards,neon-flicker 1.6s 2.4s linear both,neon-hum 4.5s 4s ease-in-out infinite}
+.footer-neon[data-lit] .neon-spark{animation:neon-run 7s linear 3s infinite,neon-spark-in 1s 3s forwards}
+.footer-neon[data-lit]:not([data-running]) text{animation-play-state:paused}
+.footer-neon:hover .neon-tube{stroke:#9baeff40}
+@keyframes neon-draw{to{stroke-dashoffset:0}}
+@keyframes neon-flicker{0%{opacity:.55}10%{opacity:1}14%{opacity:.25}20%{opacity:1}34%{opacity:.4}38%,100%{opacity:1}}
+@keyframes neon-hum{0%,100%{opacity:1}50%{opacity:.82}}
+@keyframes neon-run{to{stroke-dashoffset:-316}}
+@keyframes neon-spark-in{to{opacity:.95}}
+@media(prefers-reduced-motion:reduce){.neon-light{stroke-dashoffset:0;opacity:1;animation:none!important}.neon-spark{display:none}}
+@media(max-width:650px){.footer-neon{margin-top:55px}.neon-light{stroke-width:2.4}.neon-tube{stroke-width:1.8}}
