@@ -7,6 +7,13 @@ export const areaIcons = ['code', 'braces', 'shield', 'layers', 'terminal', 'dat
 export type PreviewKind = (typeof previewKinds)[number];
 export type AreaIcon = (typeof areaIcons)[number];
 
+/** Animated scene shown when a project opens in the list. "auto" animates the cover image. */
+export const projectScenes = ['auto', 'checklist', 'call', 'chat', 'gallery', 'rental'] as const;
+export type ProjectScene = (typeof projectScenes)[number];
+export type ProjectMetric = { value: string; label: string };
+export type ProjectDecision = { title: string; text: string };
+export type ProjectPhoto = { url: string; caption: string };
+
 export type Project = {
   id: string;
   title: string;
@@ -22,7 +29,23 @@ export type Project = {
   imageMobile?: string;
   github: string;
   live: string;
+  /** Case study fields: every one is optional; empty ones simply hide their section. */
+  scene: ProjectScene;
+  role: string;
+  status: string;
+  year: string;
+  metrics: ProjectMetric[];
+  /** One problem per line. */
+  problem: string;
+  discovery: string;
+  learnings: string[];
+  solution: string;
+  decisions: ProjectDecision[];
+  gallery: ProjectPhoto[];
 };
+
+/** Fields added for the case study; merged into older saved projects so they keep rendering. */
+export const projectCaseDefaults = { scene: 'auto' as ProjectScene, role: '', status: '', year: '', metrics: [] as ProjectMetric[], problem: '', discovery: '', learnings: [] as string[], solution: '', decisions: [] as ProjectDecision[], gallery: [] as ProjectPhoto[] };
 
 export type Principle = { title: string; text: string };
 
@@ -127,6 +150,7 @@ export const defaultContent: SiteContent = {
   },
   "projects": [
     {
+      ...structuredClone(projectCaseDefaults),
       "id": "sentinel",
       "title": "Projeto full stack",
       "type": "APLICAÇÃO / PLACEHOLDER",
@@ -143,6 +167,7 @@ export const defaultContent: SiteContent = {
       "detail": "[Explique uma decisão de implementação, uma dificuldade real e o que você mudaria hoje. Inclua resultados apenas quando tiver como demonstrá-los.]"
     },
     {
+      ...structuredClone(projectCaseDefaults),
       "id": "nexus",
       "title": "Aplicação web",
       "type": "APLICAÇÃO / PLACEHOLDER",
@@ -159,6 +184,7 @@ export const defaultContent: SiteContent = {
       "detail": "[Explique uma decisão de implementação, uma dificuldade real e o que você mudaria hoje. Inclua resultados apenas quando tiver como demonstrá-los.]"
     },
     {
+      ...structuredClone(projectCaseDefaults),
       "id": "packet-lab",
       "title": "Estudo de segurança",
       "type": "LAB / PLACEHOLDER",

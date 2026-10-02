@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from 'react';
 import { Plus, Copy, Trash2, FolderKanban, Layers3, Wrench, AlertTriangle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { areaIcons, previewKinds, uniqueId, type AreaIcon as AreaIconName, type Experience, type Project, type SiteContent, type StackArea } from '@/lib/content';
+import { areaIcons, previewKinds, projectCaseDefaults, projectScenes, uniqueId, type AreaIcon as AreaIconName, type Experience, type Project, type ProjectScene, type SiteContent, type StackArea } from '@/lib/content';
 import { AreaIcon } from '@/components/area-icon';
 import { PortraitEditor } from './portrait-editor';
 import { ImageField } from './image-field';
@@ -116,7 +116,7 @@ export function TextsEditor({ content, edit }: { content: SiteContent; edit: Edi
   </>;
 }
 
-const newProject = (taken: string[]): Project => ({ id: uniqueId('novo-projeto', taken), title: 'Novo projeto', type: 'FULL STACK APPLICATION', category: 'FullStack', description: '', detail: '', tags: [], kind: 'workspace', github: '', live: '' });
+const newProject = (taken: string[]): Project => ({ ...structuredClone(projectCaseDefaults), id: uniqueId('novo-projeto', taken), title: 'Novo projeto', type: 'FULL STACK APPLICATION', category: 'FullStack', description: '', detail: '', tags: [], kind: 'workspace', github: '', live: '' });
 
 export function ProjectsEditor({ content, edit }: { content: SiteContent; edit: Edit }) {
   const projects = content.projects;
@@ -161,8 +161,66 @@ export function ProjectsEditor({ content, edit }: { content: SiteContent; edit: 
           <Field label="Link online" type="url" value={project.live} onChange={set('live')} placeholder="https://..."/>
         </div>
       </Panel>
+      <CaseStudyEditor project={project} set={set}/>
     </div> : <div className="adm-editor"><Panel title="Sem projetos"><button className="adm-btn" onClick={add}><Plus size={14}/> Criar primeiro projeto</button></Panel></div>}
   </div>;
+}
+
+const sceneLabels: Record<ProjectScene, string> = { auto: 'Capa em movimento', checklist: 'Checklist sendo concluído', call: 'Chamada de voz e tela', chat: 'Mensagem no WhatsApp', gallery: 'Galeria de fotos', rental: 'Aluguel e manutenção (telas do app)' };
+
+// The case study shown on the project's own page; every block is optional and hides itself when empty.
+function CaseStudyEditor({ project, set }: { project: Project; set: <K extends keyof Project>(key: K) => (value: Project[K]) => void }) {
+  const metrics = project.metrics;
+  const decisions = project.decisions;
+  const gallery = project.gallery;
+  return <>
+    <Panel title="Lista da home" description="Como o projeto aparece ao abrir na lista">
+      <Select label="Animação ao abrir" value={project.scene} options={projectScenes.map(scene => ({ value: scene, label: sceneLabels[scene] }))} onChange={set('scene')}/>
+      <div className="adm-repeat">
+        <div className="adm-list-head"><span>Números em destaque (até 3)</span>{metrics.length < 3 && <button className="adm-btn small" onClick={() => set('metrics')([...metrics, { value: '', label: '' }])}><Plus size={14}/> Número</button>}</div>
+        {metrics.map((metric, i) => <div key={i} className="adm-repeat-row">
+          <div className="adm-grid">
+            <Field label="Valor" value={metric.value} placeholder="45" onChange={value => set('metrics')(metrics.map((m, j) => j === i ? { ...m, value } : m))}/>
+            <Field label="Rótulo" value={metric.label} placeholder="tabelas no banco" onChange={label => set('metrics')(metrics.map((m, j) => j === i ? { ...m, label } : m))}/>
+          </div>
+          <RowActions index={i} total={metrics.length} label={metric.label || 'número'} onMove={(from, to) => set('metrics')(move(metrics, from, to))} onRemove={() => set('metrics')(metrics.filter((_, j) => j !== i))}/>
+        </div>)}
+      </div>
+    </Panel>
+    <Panel title="Página do projeto" description="Seções do estudo de caso; as vazias não aparecem">
+      <div className="adm-grid">
+        <Field label="Papel" value={project.role} placeholder="Idealizador e desenvolvedor" onChange={set('role')}/>
+        <Field label="Status" value={project.status} placeholder="Em uso" onChange={set('status')}/>
+        <Field label="Ano" value={project.year} placeholder="2026" onChange={set('year')}/>
+      </div>
+      <TextArea label="/O problema" hint="Uma frase por linha; cada linha vira um item." rows={4} value={project.problem} onChange={set('problem')}/>
+      <TextArea label="/Descoberta" rows={4} value={project.discovery} onChange={set('discovery')}/>
+      <TextArea label="O que isso me ensinou" hint="Uma lição por linha; cada linha vira um item numerado." rows={3} value={project.learnings.join('\n')} onChange={value => set('learnings')(value.split('\n'))}/>
+      <TextArea label="/A solução" hint="Uma frase forte, mostrada grande em itálico." rows={3} value={project.solution} onChange={set('solution')}/>
+      <div className="adm-repeat">
+        <div className="adm-list-head"><span>/Decisões</span><button className="adm-btn small" onClick={() => set('decisions')([...decisions, { title: '', text: '' }])}><Plus size={14}/> Decisão</button></div>
+        {decisions.map((decision, i) => <div key={i} className="adm-repeat-row">
+          <div>
+            <Field label="Título" value={decision.title} onChange={title => set('decisions')(decisions.map((d, j) => j === i ? { ...d, title } : d))}/>
+            <TextArea label="Explicação" rows={2} value={decision.text} onChange={text => set('decisions')(decisions.map((d, j) => j === i ? { ...d, text } : d))}/>
+          </div>
+          <RowActions index={i} total={decisions.length} label={decision.title || 'decisão'} onMove={(from, to) => set('decisions')(move(decisions, from, to))} onRemove={() => set('decisions')(decisions.filter((_, j) => j !== i))}/>
+        </div>)}
+      </div>
+    </Panel>
+    <Panel title="Galeria" description="Fotos e telas do projeto, mostradas na página interna">
+      <div className="adm-repeat">
+        <div className="adm-list-head"><span>{gallery.length} fotos</span><button className="adm-btn small" onClick={() => set('gallery')([...gallery, { url: '', caption: '' }])}><Plus size={14}/> Foto</button></div>
+        {gallery.map((photo, i) => <div key={i} className="adm-repeat-row">
+          <div>
+            <ImageField label={`Foto ${i + 1}`} folder="projetos" maxSize={2000} value={photo.url} onChange={url => set('gallery')(gallery.map((p, j) => j === i ? { ...p, url } : p))} previewStyle={{ aspectRatio: '16 / 10' }}/>
+            <Field label="Legenda" value={photo.caption} onChange={caption => set('gallery')(gallery.map((p, j) => j === i ? { ...p, caption } : p))}/>
+          </div>
+          <RowActions index={i} total={gallery.length} label={photo.caption || `foto ${i + 1}`} onMove={(from, to) => set('gallery')(move(gallery, from, to))} onRemove={() => set('gallery')(gallery.filter((_, j) => j !== i))}/>
+        </div>)}
+      </div>
+    </Panel>
+  </>;
 }
 
 const newArea = (taken: string[]): StackArea => ({ id: uniqueId('nova-camada', taken), name: 'Nova camada', label: 'Descrição curta', icon: 'cpu', color: '#66c9ff', subtitle: 'Um subtítulo marcante.', description: '', tools: [{ name: 'Ferramenta', description: 'Para que serve', mark: 'Fr' }], file: 'arquivo.ts', code: '' });

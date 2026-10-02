@@ -1,9 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, ArrowDown } from 'lucide-react';
-import Link from 'next/link';
-import { ProjectCover } from './project-cover';
-import { projectPath } from '@/lib/project-path';
 
 import { RichText } from './rich-text';
 import { DrawnName } from './drawn-name';
@@ -12,6 +9,7 @@ import { FolioStack } from './folio-stack';
 import { FolioExperience } from './folio-experience';
 import { FolioContact, FolioFooter } from './folio-contact';
 import { FolioHeader } from './folio-header';
+import { ProjectAccordion } from './project-accordion';
 import type { SiteContent } from '@/lib/content';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
@@ -49,33 +47,6 @@ function Site({ content }: { content: SiteContent }) {
     document.querySelectorAll('.folio-section h2').forEach(title => observer.observe(title));
     return () => observer.disconnect();
   }, []);
-  // Covers open like a curtain the first time they enter the screen, then drift slightly against the scroll.
-  useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const covers = Array.from(document.querySelectorAll<HTMLElement>('.work-cover'));
-    const visible = new Set<HTMLElement>();
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      visible.forEach(cover => {
-        const rect = cover.getBoundingClientRect();
-        const center = (rect.top + rect.height / 2 - innerHeight / 2) / innerHeight;
-        cover.style.setProperty('--drift', `${Math.max(-1, Math.min(1, center)) * -3}%`);
-      });
-    };
-    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const cover = entry.target as HTMLElement;
-        if (entry.isIntersecting) { visible.add(cover); if (entry.intersectionRatio > .2) cover.setAttribute('data-shown', ''); }
-        else visible.delete(cover);
-      });
-      schedule();
-    }, { threshold: [0, .2] });
-    covers.forEach(cover => { cover.setAttribute('data-motion', ''); observer.observe(cover); });
-    addEventListener('scroll', schedule, { passive: true });
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); removeEventListener('scroll', schedule); };
-  }, [projects]);
   const navItems = [[t.nav.projects, 'projetos'], [t.nav.about, 'sobre'], [t.nav.stack, 'stack'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
   return <div className="folio">
     <a className="skip-link" href="#main">{t.skip}</a>
@@ -92,13 +63,7 @@ function Site({ content }: { content: SiteContent }) {
       </section>
       <section id="projetos" className="folio-section folio-work">
         <div className="folio-section-head"><div><p className="folio-role">01 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
-        <div className="work-gallery">{projects.map((project,index) => <Link className="work-item" key={project.id} href={projectPath(locale,project.id)}>
-          {/* The "open" badge follows the pointer over the cover. */}
-          <div className="work-cover" onPointerMove={event => { const rect = event.currentTarget.getBoundingClientRect(); event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`); event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`); }}><ProjectCover project={project}/><span className="work-open"><span>{t.openProject}</span><ArrowUpRight size={18}/></span></div>
-          <div className="work-heading"><span className="work-index">{String(index+1).padStart(2,'0')}</span><h3>{project.title}</h3><span className="work-category">{project.category}</span><ArrowUpRight size={25}/></div>
-          <p className="work-description">{project.description}</p>
-          {project.tags.length > 0 && <ul className="work-tags">{project.tags.slice(0,5).map(tag => <li key={tag}>{tag}</li>)}{project.tags.length > 5 && <li>+{project.tags.length - 5}</li>}</ul>}
-        </Link>)}</div>
+        <ProjectAccordion projects={projects} locale={locale}/>
       </section>
       <FolioAbout about={about} label={t.nav.about}/>
       <FolioStack toolkit={toolkit} label={t.nav.stack}/>

@@ -194,3 +194,7 @@
 .adm-locale button[aria-checked=true]{background:#66c9ff1f;color:var(--accent)}
 .adm-banner.subtle{border-color:var(--line);background:transparent;color:var(--dim)}
 @media(max-width:860px){.adm-locale{order:3}}
+
+/* Repeating groups in the case study editor (numbers, decisions, gallery). */
+.adm-repeat{display:grid;gap:10px;margin-top:6px}
+.adm-repeat-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:10px}

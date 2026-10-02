@@ -1,4 +1,4 @@
-import { defaultContent, type SiteContent } from './content';
+import { defaultContent, projectCaseDefaults, type SiteContent } from './content';
 import { upgradeTemplateContent } from './content-migration';
 
 // Fill in fields added to the model after the content was saved, so old data keeps rendering.
@@ -13,7 +13,7 @@ export function mergeContent(value: unknown): SiteContent {
     strip: { ...defaultContent.strip, ...stored.strip },
     about: { ...defaultContent.about, ...stored.about },
     projectsSection: { ...defaultContent.projectsSection, ...stored.projectsSection },
-    projects: (stored.projects ?? defaultContent.projects).map(project => ({ image: '', imageMobile: '', ...project })),
+    projects: (stored.projects ?? defaultContent.projects).map(project => ({ image: '', imageMobile: '', ...structuredClone(projectCaseDefaults), ...project })),
     toolkit: { ...defaultContent.toolkit, ...stored.toolkit },
     experience: { ...defaultContent.experience, ...stored.experience },
     contact: { ...defaultContent.contact, ...stored.contact },
