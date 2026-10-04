@@ -1,22 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Layers } from 'lucide-react';
 import type { SiteContent, Tool } from '@/lib/content';
 import type { ToolIcons } from '@/lib/tool-icons';
 import { AreaIcon } from './area-icon';
 import { RichText } from './rich-text';
 import { useI18n } from '@/lib/i18n';
 
-const ROW = 100; // px between tool rows on the board.
-const PAD = 40;
+const HUB = 130; // px height of the strip where the wires fan out from the core to the columns.
+const GAP = 24; // must match the column gap in .stk-columns
 
-// Copy and area pills on the left; on the right the chosen area as a hub: its tools wired into a glowing core.
+// Everything visible at once: a glowing core wired to one column per area, each listing its tools with logos.
 export function FolioStack({ toolkit, icons, label }: { toolkit: SiteContent['toolkit']; icons: ToolIcons; label: string }) {
-  const areas = toolkit.areas.filter(area => area.tools.length || area.description);
   const { t } = useI18n();
-  const [active, setActive] = useState(0);
-  const [hot, setHot] = useState<number | null>(null);
-  // Wires are drawn in real pixels (a stretched SVG would distort dashes), so the board width is measured.
+  const areas = toolkit.areas.filter(area => area.tools.length || area.description);
+  const total = new Set(areas.flatMap(area => area.tools.map(tool => tool.name))).size;
+  const number = (value: number) => String(value).padStart(2, '0');
+  // Wires are drawn in real pixels, so the board width is measured.
   const board = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -26,66 +27,39 @@ export function FolioStack({ toolkit, icons, label }: { toolkit: SiteContent['to
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
-  const area = areas[Math.min(active, areas.length - 1)];
-  const number = (value: number) => String(value).padStart(2, '0');
-  if (!area) return null;
+  if (!areas.length) return null;
 
-  // Tools split into a left and a right column, each centered on the core.
-  const half = Math.ceil(area.tools.length / 2);
-  const rows = Math.max(half, 4);
-  const height = rows * ROW + PAD * 2;
-  const core = height / 2;
-  const placed = area.tools.map((tool, index) => {
-    const left = index < half, inSide = left ? index : index - half, count = left ? half : area.tools.length - half;
-    const y = PAD + (inSide + .5 + (rows - count) / 2) * ROW;
-    const x = left ? 13 : 87, at = (percent: number) => percent / 100 * width;
-    // Each wire reaches the core at its own height, like cables plugged side by side.
-    const entry = core + (inSide - (count - 1) / 2) * 11;
-    return { tool, index, x, y, wire: `M${at(x)} ${y}H${at(left ? 31 : 69)}V${entry}H${at(50)}` };
+  const column = (width - GAP * (areas.length - 1)) / areas.length;
+  const wires = areas.map((_, index) => {
+    // Straight dashed lines fanning out from under the core to the middle of each column header.
+    const x = index * (column + GAP) + column / 2, from = width / 2 + (index - (areas.length - 1) / 2) * 16;
+    return `M${from} 0L${x} ${HUB}`;
   });
-  const select = (index: number) => { setActive(index); setHot(null); };
 
   return <section id="stack" className="folio-section stk">
-    <div className="stk-layout">
-      <div className="stk-copy">
-        <p className="folio-role">01 / {label}</p>
-        <h2>{toolkit.title} {toolkit.accent && <span>{toolkit.accent}</span>}</h2>
-        {toolkit.text && <RichText text={toolkit.text}/>}
-        <div className="stk-areas" role="tablist" aria-label={label}>
-          {areas.map((item, index) => <button key={item.id} role="tab" id={`stk-tab-${item.id}`} aria-selected={index === active} aria-controls="stk-board"
-            onClick={() => select(index)} onPointerEnter={event => { if (event.pointerType === 'mouse' && index !== active) select(index); }} onFocus={() => index !== active && select(index)}
-            style={{ '--area': item.color || 'var(--accent)' } as CSSProperties}>
-            <AreaIcon name={item.icon} size={15} aria-hidden="true"/>{item.name}<sup>{number(item.tools.length)}</sup>
-          </button>)}
-        </div>
-        <div className="stk-info" key={area.id} style={{ '--area': area.color || 'var(--accent)' } as CSSProperties}>
-          <p className="folio-role">{area.label || area.name}</p>
-          {area.subtitle && <h3>{area.subtitle}</h3>}
-          {area.description && <RichText text={area.description}/>}
-          {area.code.trim() && <pre className="stk-code">{area.file && <span>{area.file}</span>}<code>{area.code}</code></pre>}
-        </div>
-      </div>
-
-      <div className="stk-board" id="stk-board" ref={board} role="tabpanel" aria-labelledby={`stk-tab-${area.id}`}
-        style={{ '--area': area.color || 'var(--accent)', '--board-h': `${height}px` } as CSSProperties}>
-        {width > 0 && <svg className="stk-wires" key={`wires-${area.id}`} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
-          {placed.map(({ wire, index }) => <g key={index} className={hot === index ? 'is-hot' : undefined} style={{ '--i': index } as CSSProperties}>
+    <div className="folio-section-head"><div><p className="folio-role">01 / {label}</p><h2>{toolkit.title} {toolkit.accent && <span>{toolkit.accent}</span>}</h2></div>{toolkit.text && <div className="stk-intro"><RichText text={toolkit.text}/></div>}</div>
+    <div className="stk-board" ref={board}>
+      <div className="stk-hub" aria-hidden="true">
+        <div className="stk-core"><span className="stk-core-tile"><Layers size={30} strokeWidth={1.5}/></span><small>{number(total)} {t.tools.toLowerCase()}</small></div>
+        {width > 0 && <svg className="stk-wires" viewBox={`0 0 ${width} ${HUB}`} style={{ height: HUB }}>
+          {wires.map((wire, index) => <g key={areas[index].id} style={{ '--area': areas[index].color || 'var(--accent)', '--i': index } as CSSProperties}>
             <path className="stk-wire" d={wire} pathLength={100}/>
             <path className="stk-pulse" d={wire} pathLength={100}/>
           </g>)}
         </svg>}
-        <div className="stk-core" key={`core-${area.id}`} style={{ top: core }}>
-          <span className="stk-core-tile"><AreaIcon name={area.icon} size={34} strokeWidth={1.5} aria-hidden="true"/></span>
-          <span className="stk-core-name">{area.name}<small>{number(area.tools.length)} {t.tools.toLowerCase()}</small></span>
-        </div>
-        <ul className="stk-tools" key={`tools-${area.id}`}>
-          {placed.map(({ tool, index, x, y }) => <li key={`${tool.name}-${index}`} tabIndex={0} className={x < 50 ? 'is-left' : 'is-right'}
-            style={{ '--x': `${x}%`, '--y': `${y}px`, '--i': index, '--brand': icons[tool.name]?.color || 'var(--fg)' } as CSSProperties}
-            onPointerEnter={() => setHot(index)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(index)} onBlur={() => setHot(null)}>
-            <ToolMark tool={tool} icons={icons}/>
-            <span className="stk-tool-text"><strong>{tool.name}</strong>{tool.description && <small>{tool.description}</small>}</span>
-          </li>)}
-        </ul>
+      </div>
+      <div className="stk-columns" style={{ '--cols': areas.length } as CSSProperties}>
+        {areas.map((area, index) => <article key={area.id} className="stk-area" style={{ '--area': area.color || 'var(--accent)', '--i': index } as CSSProperties}>
+          <h3 className="stk-area-head"><AreaIcon name={area.icon} size={16} aria-hidden="true"/>{area.name}<sup>{number(area.tools.length)}</sup></h3>
+          {area.description && <RichText className="stk-area-text" text={area.description}/>}
+          <ul className="stk-tools">
+            {area.tools.map((tool, toolIndex) => <li key={`${tool.name}-${toolIndex}`} style={{ '--brand': icons[tool.name]?.color || 'var(--fg)', '--j': toolIndex } as CSSProperties}>
+              <ToolMark tool={tool} icons={icons}/>
+              <span><strong>{tool.name}</strong>{tool.description && <small>{tool.description}</small>}</span>
+            </li>)}
+          </ul>
+          {area.code.trim() && <pre className="stk-code">{area.file && <span>{area.file}</span>}<code>{area.code}</code></pre>}
+        </article>)}
       </div>
     </div>
   </section>;
