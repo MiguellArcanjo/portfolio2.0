@@ -205,7 +205,7 @@ export const defaultContent: SiteContent = {
   "toolkit": {
     "title": "Stack de trabalho.",
     "accent": "Peça por peça.",
-    "text": "Ferramentas e onde elas entram.\nSelecione uma área ou continue rolando.",
+    "text": "O que uso para construir, publicar e proteger aplicações.",
     "areas": [
       {
         "id": "frontend",

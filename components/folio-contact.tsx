@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowUp, ArrowUpRight, Check, Copy } from 'lucide-react';
 import type { SiteContent } from '@/lib/content';
 import { useI18n } from '@/lib/i18n';
 import { RichText } from './rich-text';
+import { whatsappUrl } from '@/lib/whatsapp';
 
 const words = {
   pt: { email: 'E-mail', time: 'Horário local', navigation: 'Navegação', networks: 'Redes', language: 'Idioma', rights: 'Todos os direitos reservados.' },
@@ -67,42 +68,6 @@ export function FolioContact({ content, label }: { content: SiteContent; label: 
   </section>;
 }
 
-// The name as a neon sign: the tube draws itself when the footer arrives, flickers on, and then sparks of
-// light keep running along every letter. The SVG viewBox is cut to the text, so it fills the width at any length.
-function FooterName({ name }: { name: string }) {
-  const box = useRef<HTMLDivElement>(null);
-  const svg = useRef<SVGSVGElement>(null);
-  const [viewBox, setViewBox] = useState('0 0 1000 120');
-  useEffect(() => {
-    const fit = () => {
-      const text = svg.current?.querySelector('text');
-      if (!text) return;
-      const b = text.getBBox();
-      const pad = 8;
-      setViewBox(`${b.x - pad} ${b.y - pad} ${b.width + pad * 2} ${b.height + pad * 2}`);
-    };
-    fit();
-    document.fonts?.ready.then(fit);
-  }, [name]);
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    // Lights up once; the running light only animates while the sign is on screen.
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.intersectionRatio > .35) el.setAttribute('data-lit', '');
-      el.toggleAttribute('data-running', entry.isIntersecting);
-    }, { threshold: [0, .35] });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-  const layer = (className: string) => <text className={className} x="0" y="100">{name}</text>;
-  return <div className="footer-neon" ref={box} aria-hidden="true">
-    <svg ref={svg} viewBox={viewBox} preserveAspectRatio="xMinYMid meet">
-      {layer('neon-tube')}{layer('neon-light')}{layer('neon-spark')}
-    </svg>
-  </div>;
-}
-
 export function FolioFooter({ content, nav, languages }: { content: SiteContent; nav: [string, string][]; languages: ReactNode }) {
   const { locale, t } = useI18n();
   const { profile } = content;
@@ -118,11 +83,11 @@ export function FolioFooter({ content, nav, languages }: { content: SiteContent;
         {profile.email && <a href={`mailto:${profile.email}`}>{w.email}</a>}
         {profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>}
         {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>}
+        <a href={whatsappUrl(t.whatsappMessage)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
       </div>
       <div><p className="footer-heading">{w.language}</p>{languages}</div>
       <a className="footer-top" href="#inicio" aria-label={t.backToTop}><ArrowUp size={22}/></a>
     </div>
-    <FooterName name={profile.name}/>
     <div className="footer-bottom">
       <span>© {new Date().getFullYear()} {profile.name}. {w.rights}</span>
       <span>{t.footer}</span>

@@ -53,68 +53,59 @@
 }
 @keyframes name-fallback{from{opacity:0}to{opacity:1}}
 
-/* About (components/folio-about.tsx): sticky title, text read along with the scroll, notes as cards. */
-.folio .folio-about{display:block}.about-top{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px 100px;align-items:start}
-.about-head{position:sticky;top:40px}.about-head .folio-role{margin-bottom:22px}
+/* About (components/folio-about.tsx): the first sentence as a big statement, the rest read along with the scroll, notes with big numbers. */
+.folio .folio-about{display:block}
+.about-statement{margin:30px 0 70px;font-size:clamp(34px,4.4vw,64px);font-weight:500;line-height:1.08;letter-spacing:-.05em;color:var(--fg);max-width:1200px}
+.about-split{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px 100px;align-items:start}
 .about-lead p{font-size:clamp(20px,1.85vw,26px);line-height:1.55;letter-spacing:-.015em;color:var(--fg)}.about-lead p+p{margin-top:28px}
 .about-lead[data-reading] .lit-word{color:#4b4e52;transition:color .4s ease}.about-lead[data-reading] .lit-word[data-lit]{color:var(--fg)}
-.about-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:34px;margin-top:50px}
-.about-card{position:relative;padding-top:28px;border-top:1px solid var(--border)}
-.about-card:before{content:'';position:absolute;left:0;top:-1px;width:100%;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.22,1,.36,1)}
-.about-card:hover:before{transform:scaleX(1)}
-.about-card-index{font-family:var(--mono);font-size:11px;color:var(--accent)}
-.about-card h3{font-size:25px;margin:18px 0 14px;color:var(--fg)}
-.folio-about .about-card .rich-text{font-size:14px;line-height:1.75}
+/* Notes in a zigzag, joined by a rope drawn with the scroll (useRope). Knots sit in a side column so the rope never crosses text. */
+.about-roped{position:relative}
+.about-roped>:not(svg){position:relative;z-index:1}
+.about-rope{position:absolute;left:0;top:0;z-index:0;overflow:visible;pointer-events:none}
+.about-rope path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.about-rope-track{stroke:#2c2f33;stroke-width:1.5;stroke-dasharray:3 7}
+.about-rope-line{stroke:var(--accent);stroke-width:2;filter:drop-shadow(0 0 6px #9baeff88)}
+.about-rope-tip{fill:#fff;filter:drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 3px var(--accent));transition:opacity .3s}
+.about-notes{--num:clamp(64px,7vw,110px);list-style:none;padding:0;margin:130px 0 0;display:flex;flex-direction:column;gap:110px}
+.about-notes li{position:relative;width:min(600px,52%);padding-left:64px}
+.about-notes li:nth-child(even){align-self:flex-end;padding:0 64px 0 0;text-align:right}
+.about-knot{position:absolute;left:12px;top:calc(var(--num) * .45 - 9px);width:18px;height:18px;border-radius:50%;border:1.5px solid #4a4e53;background:var(--bg);transition:border-color .4s,background .4s,box-shadow .6s,scale .5s cubic-bezier(.22,1,.36,1)}
+.about-notes li:nth-child(even) .about-knot{left:auto;right:12px}
+.about-notes li[data-reached] .about-knot{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 6px #9baeff22,0 0 24px var(--accent);scale:1.1}
+.about-notes strong{display:block;font-size:var(--num);font-weight:500;letter-spacing:-.07em;line-height:.9;color:transparent;-webkit-text-stroke:1px #6b6f74;margin-bottom:24px;transition:-webkit-text-stroke-color .6s,color .6s}
+.about-notes li[data-reached] strong{-webkit-text-stroke-color:var(--accent);color:#9baeff14}
+.about-notes h3{font-size:22px;margin-bottom:10px;color:var(--fg)}
+.folio-about .about-notes .rich-text{font-size:14px;line-height:1.75}
+@media(max-width:1000px){.about-split{grid-template-columns:1fr;gap:30px}.about-notes li{width:min(600px,80%)}}
+@media(max-width:650px){.about-statement{margin:24px 0 46px}.about-notes{margin-top:90px;gap:80px}.about-notes li{width:100%;padding-left:44px}.about-notes li:nth-child(even){padding:0 44px 0 0}.about-knot{left:4px}.about-notes li:nth-child(even) .about-knot{right:4px}.about-notes strong{margin-bottom:16px}}
 
-/* Stack (components/folio-stack.tsx): one row per area with logo chips; FolioStackTable is a test variant (core wired to columns). */
+/* Stack (components/folio-stack.tsx): one card per area with a faded logo in the background and every tool as a chip. */
 .stk-intro{max-width:420px;align-self:end}.folio .stk-intro .rich-text{font-size:15px}
-.stk-rows{border-top:1px solid var(--border)}
-.stk-row{display:grid;grid-template-columns:260px minmax(0,1fr);gap:40px;align-items:center;padding:30px 0;border-bottom:1px solid var(--border)}
-.stk-row h3{display:flex;align-items:center;gap:12px;font-size:clamp(22px,2.2vw,30px);color:var(--fg)}
-.stk-row h3 svg{color:var(--area);flex:none}
-.stk-row h3 sup,.stk-area-head sup{font-family:var(--font-plex-mono),monospace;font-size:10px;letter-spacing:0;color:var(--muted)}
-.stk-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
-.stk-chips li{display:inline-flex;align-items:center;gap:10px;padding:8px 15px 8px 9px;border:1px solid var(--border);border-radius:999px;background:#17191c;font-size:14px;color:#dcddd8;transition:border-color .3s,transform .4s cubic-bezier(.22,1,.36,1)}
-.stk-chips li:hover{border-color:color-mix(in srgb,var(--brand) 55%,var(--border));transform:translateY(-2px)}
-.stk-logo{width:28px;height:28px;flex:none;display:grid;place-items:center;border-radius:50%;background:#212428}
-.stk-logo svg{width:15px;height:15px;fill:var(--brand)}
+.stk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.stk-card{position:relative;overflow:hidden;isolation:isolate;min-height:300px;padding:30px;border-radius:24px;border:1px solid var(--border);background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--area) 16%,transparent),transparent 60%),linear-gradient(160deg,#1a1d21,#141619);transition:border-color .5s}
+.stk-card:hover{border-color:color-mix(in srgb,var(--area) 35%,var(--border))}
+.stk-ghost{position:absolute;right:-34px;bottom:-46px;width:250px;height:250px;z-index:-1;fill:var(--area);opacity:.08;rotate:-10deg;pointer-events:none;transition:opacity .6s,rotate 1s cubic-bezier(.22,1,.36,1)}
+.stk-card:hover .stk-ghost{opacity:.12;rotate:-4deg}
+/* Area tag: the icon in a softly tinted tile, the label as a quiet mono caption beside it. */
+.stk-badge{display:flex;align-items:center;gap:14px;font-family:var(--font-plex-mono),monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stk-badge-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;color:var(--area);background:linear-gradient(160deg,color-mix(in srgb,var(--area) 20%,transparent),color-mix(in srgb,var(--area) 6%,transparent));border:1px solid color-mix(in srgb,var(--area) 30%,transparent);box-shadow:inset 0 1px 0 #ffffff14,0 8px 24px -12px var(--area)}
+.stk-card h3{font-size:clamp(28px,3vw,42px);margin:28px 0 24px;color:var(--fg)}
+.stk-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.stk-chips li{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 8px;border:1px solid var(--border);border-radius:999px;background:#17191ccc;backdrop-filter:blur(6px);font-size:13px;white-space:nowrap;color:#dcddd8;transition:border-color .4s,transform .4s cubic-bezier(.22,1,.36,1)}
+.stk-chips li:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brand) 55%,var(--border))}
+.stk-logo{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:50%;background:#212428}
+.stk-logo svg{width:14px;height:14px;fill:var(--brand)}
 .stk-logo b{font-family:var(--font-plex-mono),monospace;font-size:9px;font-weight:500;color:var(--area)}
-.stk-board{position:relative}
-.stk-hub{position:relative;display:grid;justify-items:center}
-.stk-hub:before{content:'';position:absolute;left:50%;top:-40px;width:520px;height:300px;translate:-50% 0;background:radial-gradient(closest-side,#9baeff22,transparent);pointer-events:none}
-.stk-core{position:relative;z-index:1}
-.stk-core-tile{width:96px;height:96px;display:grid;place-items:center;border-radius:24px;background:linear-gradient(160deg,#272a30,#111315);border:1px solid #45494f;color:var(--fg);box-shadow:inset 0 1px 0 #ffffff14,0 0 60px -10px #9baeffaa}
-.stk-core small{position:absolute;left:calc(100% + 18px);top:50%;translate:0 -50%;white-space:nowrap;font-family:var(--font-plex-mono),monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.stk-wires{display:block;width:100%}
-.stk-wire,.stk-pulse{fill:none}
-.stk-wire{stroke:color-mix(in srgb,var(--area) 45%,#3d4147);stroke-width:1.2;stroke-dasharray:4 5}
-.stk-pulse{stroke:var(--area);stroke-width:2;stroke-linecap:round;stroke-dasharray:5 200;stroke-dashoffset:5;opacity:0}
-.stk-columns{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:20px;align-items:start}
-.stk-area{min-width:0}
-.stk-area-head{display:flex;align-items:center;justify-content:center;gap:9px;padding:13px 16px;margin-bottom:12px;border-radius:12px;background:var(--area);color:#111;font-size:15px;letter-spacing:-.01em;box-shadow:0 14px 34px -16px var(--area)}
-.stk-area-head sup{color:#111;opacity:.6}
-.stk-chips-col{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.stk-chips-col li{border-radius:10px;font-size:13px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-@media(prefers-reduced-motion:no-preference){
- .stk-pulse{opacity:.95;animation:stk-pulse 3s cubic-bezier(.45,0,.55,1) infinite;animation-delay:calc(var(--i) * .55s)}
- .stk-core-tile{animation:stk-glow 3.4s ease-in-out infinite}
- @supports (animation-timeline:view()){
-  .stk-row,.stk-area{animation:stk-rise linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
- }
-}
-@keyframes stk-pulse{from{stroke-dashoffset:5}to{stroke-dashoffset:-100}}
-@keyframes stk-rise{from{opacity:0;transform:translateY(20px)}}
-@keyframes stk-glow{50%{box-shadow:inset 0 1px 0 #ffffff14,0 0 90px 0 #9baeff88}}
-@media(max-width:1000px){
- .stk-row{grid-template-columns:1fr;gap:18px}
- .stk-hub{display:none}
- .stk-columns{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 20px}
-}
+@media(max-width:1000px){.stk-card{padding:26px}}
 @media(max-width:650px){
- .stk-row{padding:24px 0}
- .stk-chips{gap:8px}.stk-chips li{font-size:13px;padding:6px 12px 6px 7px;gap:8px}
- .stk-logo{width:24px;height:24px}.stk-logo svg{width:13px;height:13px}
- .stk-columns{grid-template-columns:1fr}
+ .stk-grid{grid-template-columns:1fr}
+ .stk-card{min-height:0;padding:24px 20px;border-radius:20px}
+ .stk-card h3{margin:22px 0 18px}
+ .stk-badge-icon{width:38px;height:38px;border-radius:11px}
+ .stk-chips li{font-size:12px;padding:6px 12px 6px 7px;gap:8px}
+ .stk-logo{width:22px;height:22px}.stk-logo svg{width:12px;height:12px}
+ .stk-ghost{width:190px;height:190px}
 }
 
 /* Project covers: a curtain opens them once, then they drift against the scroll; a light sweeps over on hover. */
@@ -132,21 +123,11 @@
 @media(prefers-reduced-motion:no-preference){
  .folio-portrait{animation:portrait-reveal 1.5s cubic-bezier(.77,0,.18,1) .45s both}
  .folio-portrait img{animation:portrait-zoom 2.2s cubic-bezier(.22,1,.36,1) .45s both}
- @supports (animation-timeline:view()){
-  .about-card{animation:folio-enter linear both;animation-timeline:view();animation-range:entry calc(var(--i) * 12%) entry calc(70% + var(--i) * 12%)}
- }
 }
 @keyframes portrait-reveal{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0)}}
 @keyframes portrait-zoom{from{scale:1.2}to{scale:1}}
 @media(prefers-reduced-motion:reduce){.work-cover:after{display:none}}
 
-@media(max-width:1000px){
- .about-top{grid-template-columns:1fr;gap:30px}.about-head{position:static}
- .about-cards{grid-template-columns:1fr;gap:26px;margin-top:20px}
-}
-@media(max-width:650px){
- .about-card h3{font-size:21px}
-}
 
 /* Experience (components/folio-experience.tsx): a timeline whose line fills with the scroll. */
 .xp-summary{display:flex;gap:44px;align-items:flex-end}
@@ -286,7 +267,7 @@
 .folio .footer-top:hover{background:var(--fg);border-color:var(--fg);color:#111}
 .footer-top:hover svg{animation:footer-up .7s cubic-bezier(.22,1,.36,1)}
 @keyframes footer-up{45%{transform:translateY(-140%)}46%{transform:translateY(140%)}}
-.footer-bottom{display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:26px 0 34px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+.footer-bottom{display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;margin-top:80px;padding:26px 0 34px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
 @media(prefers-reduced-motion:no-preference){
  @supports (animation-timeline:view()){
   .contact-channels li,.contact-email{animation:folio-enter linear both;animation-timeline:view();animation-range:entry 0% entry 60%}
@@ -302,7 +283,7 @@
  .contact-channels{grid-template-columns:1fr}
  .contact-email i{width:52px;height:52px}
  .folio-footer-big{padding-top:50px}
- .footer-bottom{flex-direction:column}
+ .footer-bottom{flex-direction:column;margin-top:55px}
 }
 
 /* Top bar (components/folio-header.tsx): fixed, hides while reading down, returns compact with a backdrop. */
@@ -338,7 +319,7 @@ a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visibl
 .folio-topbar[data-open]{background:var(--bg);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 .folio-overlay{display:none}
 /* Sticky blocks move down while the bar is showing, so it never covers them. */
-.about-head,.xp-when,.case-body aside{top:calc(40px + var(--header-space));transition:top .45s cubic-bezier(.22,1,.36,1)}
+.xp-when,.case-body aside{top:calc(40px + var(--header-space));transition:top .45s cubic-bezier(.22,1,.36,1)}
 @media(max-width:1000px){.folio-topbar .folio-nav{gap:20px}}
 @media(max-width:650px){
  .topbar-space{height:78px}
@@ -361,24 +342,6 @@ a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visibl
 @media(prefers-reduced-motion:reduce){.folio-topbar,.folio-overlay,.folio-overlay nav a{transition:none}}
 .folio .lang-switch.in-overlay{flex-direction:row;gap:16px}
 .folio-topbar[data-open] .topbar-progress{opacity:0}
-/* Footer name as a neon sign (FooterName in components/folio-contact.tsx). */
-.footer-neon{margin:80px 0 10px;--neon:var(--accent)}
-.footer-neon svg{display:block;width:100%;height:auto;overflow:visible}
-.footer-neon text{font-family:var(--font-dm-sans),sans-serif;font-size:100px;font-weight:500;letter-spacing:-.065em;fill:none;stroke-linejoin:round;stroke-linecap:round}
-.neon-tube{stroke:#9baeff1c;stroke-width:1.2;transition:stroke .6s}
-.neon-light{stroke:var(--neon);stroke-width:1.7;stroke-dasharray:600;stroke-dashoffset:600;opacity:.55;filter:drop-shadow(0 0 2px var(--neon)) drop-shadow(0 0 10px color-mix(in srgb,var(--neon) 65%,transparent))}
-.neon-spark{stroke:#f3f5ff;stroke-width:2.2;stroke-dasharray:16 300;opacity:0;filter:drop-shadow(0 0 3px var(--neon)) drop-shadow(0 0 9px var(--neon))}
-.footer-neon[data-lit] .neon-light{animation:neon-draw 2.6s cubic-bezier(.65,0,.35,1) forwards,neon-flicker 1.6s 2.4s linear both,neon-hum 4.5s 4s ease-in-out infinite}
-.footer-neon[data-lit] .neon-spark{animation:neon-run 7s linear 3s infinite,neon-spark-in 1s 3s forwards}
-.footer-neon[data-lit]:not([data-running]) text{animation-play-state:paused}
-.footer-neon:hover .neon-tube{stroke:#9baeff40}
-@keyframes neon-draw{to{stroke-dashoffset:0}}
-@keyframes neon-flicker{0%{opacity:.55}10%{opacity:1}14%{opacity:.25}20%{opacity:1}34%{opacity:.4}38%,100%{opacity:1}}
-@keyframes neon-hum{0%,100%{opacity:1}50%{opacity:.82}}
-@keyframes neon-run{to{stroke-dashoffset:-316}}
-@keyframes neon-spark-in{to{opacity:.95}}
-@media(prefers-reduced-motion:reduce){.neon-light{stroke-dashoffset:0;opacity:1;animation:none!important}.neon-spark{display:none}}
-@media(max-width:650px){.footer-neon{margin-top:55px}.neon-light{stroke-width:2.4}.neon-tube{stroke-width:1.8}}
 
 /* Projects accordion (components/project-accordion.tsx). */
 .pj-list{list-style:none;margin:0;padding:0;display:grid;gap:14px}
@@ -628,3 +591,4 @@ a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visibl
 /* Tall phone screens in the gallery keep a sensible height, centred on the frame. */
 .case-gallery button{display:flex;justify-content:center}
 .case-gallery img{width:auto;max-width:100%;max-height:min(78vh,760px)}
+

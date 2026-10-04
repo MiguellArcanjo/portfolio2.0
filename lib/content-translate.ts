@@ -31,6 +31,7 @@ const phrases: [pt: string, en: string, es: string][] = [
   ['Estudo de segurança', 'Security study', 'Estudio de seguridad'],
   ['Stack de trabalho.', 'Work stack.', 'Stack de trabajo.'],
   ['Peça por peça.', 'Piece by piece.', 'Pieza por pieza.'],
+  ['O que uso para construir, publicar e proteger aplicações.', 'What I use to build, ship and secure applications.', 'Lo que uso para construir, publicar y proteger aplicaciones.'],
   ['Ferramentas e onde elas entram.\nSelecione uma área ou continue rolando.', 'Tools and where they fit in.\nPick an area or keep scrolling.', 'Herramientas y dónde encajan.\nElige un área o sigue desplazándote.'],
   ['Interface e estado.', 'Interface and state.', 'Interfaz y estado.'],
   ['Componentes, estado, navegação e acessibilidade. [Adicione um exemplo de onde você usou essas ferramentas.]', 'Components, state, navigation and accessibility. [Add an example of where you used these tools.]', 'Componentes, estado, navegación y accesibilidad. [Agrega un ejemplo de dónde usaste estas herramientas.]'],

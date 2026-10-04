@@ -5,7 +5,7 @@ import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import { RichText } from './rich-text';
 import { DrawnName } from './drawn-name';
 import { FolioAbout } from './folio-about';
-import { FolioStack, FolioStackTable } from './folio-stack';
+import { FolioStack } from './folio-stack';
 import { FolioExperience } from './folio-experience';
 import { FolioContact, FolioFooter } from './folio-contact';
 import { FolioHeader } from './folio-header';
@@ -14,6 +14,7 @@ import type { SiteContent } from '@/lib/content';
 import type { ToolIcons } from '@/lib/tool-icons';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
+import { whatsappUrl } from '@/lib/whatsapp';
 
 export function Home({ content, locale, toolIcons }: { content: SiteContent; locale: Locale; toolIcons: ToolIcons }) {
   return <I18nProvider locale={locale}><Site content={content} toolIcons={toolIcons}/></I18nProvider>;
@@ -59,12 +60,10 @@ function Site({ content, toolIcons }: { content: SiteContent; toolIcons: ToolIco
         <div className="hero-bottom-grid">
           <div className="hero-description"><RichText text={content.hero.text}/><a className="hero-project-link" href="#projetos">{t.seeProjects}<ArrowDown size={22}/></a></div>
           <div className="folio-portrait">{profile.photo && !photoFailed ? <img src={profile.photo} alt={profile.photoAlt} style={{ objectPosition: profile.photoPosition }} onError={() => setPhotoFailed(true)} fetchPriority="high"/> : <span aria-hidden="true">{profile.initials}</span>}</div>
-          <div className="hero-side"><span>{profile.status}</span><div>{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={17}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ArrowUpRight size={17}/></a>}</div></div>
+          <div className="hero-side"><span>{profile.status}</span><div>{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={17}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ArrowUpRight size={17}/></a>}<a href={whatsappUrl(t.whatsappMessage)} target="_blank" rel="noopener noreferrer">WhatsApp<ArrowUpRight size={17}/></a></div></div>
         </div>
       </section>
       <FolioStack toolkit={toolkit} icons={toolIcons} label={t.nav.stack}/>
-      {/* Temporary: second layout to compare with the one above; remove once the owner picks one. */}
-      <FolioStackTable toolkit={toolkit} icons={toolIcons} label={t.nav.stack}/>
       <section id="projetos" className="folio-section folio-work">
         <div className="folio-section-head"><div><p className="folio-role">02 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
         <ProjectAccordion projects={projects} locale={locale}/>

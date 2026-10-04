@@ -14,7 +14,7 @@ Next.js 16 (App Router, Turbopack, `proxy.ts`), React 19, TypeScript. Conteúdo 
 
 ## Mapa rápido
 
-- `components/home.tsx` — home (layout "folio", estilos em `app/folio.css`). Seções: `drawn-name.tsx` (nome desenhado), `folio-about.tsx`, `folio-stack.tsx`, `folio-experience.tsx`, `folio-contact.tsx` (contato + rodapé com nome em neon), `folio-header.tsx` (barra fixa).
+- `components/home.tsx` — home (layout "folio", estilos em `app/folio.css`). Seções: `drawn-name.tsx` (nome desenhado), `folio-about.tsx`, `folio-stack.tsx`, `folio-experience.tsx`, `folio-contact.tsx` (contato + rodapé), `folio-header.tsx` (barra fixa).
 - `components/project-page.tsx` — página interna `/projetos/[id]` (PT) e `/en|es/projetos/[id]`.
 - `lib/content.ts` — modelo `SiteContent`/`Project` e conteúdo padrão; `lib/content-merge.ts` completa campos novos em conteúdo antigo.
 - `components/admin/editors.tsx` — editores do `/admin` (`ProjectsEditor`, etc.); campos em `components/admin/fields.tsx`, upload em `image-field.tsx` (bucket `portfolio`).
