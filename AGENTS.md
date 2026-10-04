@@ -18,6 +18,8 @@ Next.js 16 (App Router, Turbopack, `proxy.ts`), React 19, TypeScript. Conteúdo 
 - `components/project-page.tsx` — página interna `/projetos/[id]` (PT) e `/en|es/projetos/[id]`.
 - `lib/content.ts` — modelo `SiteContent`/`Project` e conteúdo padrão; `lib/content-merge.ts` completa campos novos em conteúdo antigo.
 - `components/admin/editors.tsx` — editores do `/admin` (`ProjectsEditor`, etc.); campos em `components/admin/fields.tsx`, upload em `image-field.tsx` (bucket `portfolio`).
+- **Rotas**: um layout raiz por idioma para o `<html lang>` sair certo do servidor — `app/(pt)/` (home, `projetos/`, `admin/`), `app/en/`, `app/es/`, todos usando `components/root-document.tsx` (fontes e metadados base). Não existe `app/layout.tsx`; URLs inexistentes caem em `app/global-not-found.tsx` (flag `experimental.globalNotFound` no `next.config.ts`). Em `revalidatePath`, as rotas PT levam o grupo: `/(pt)/projetos/[id]`.
+- **SEO**: `lib/seo.ts` (títulos/descrições por idioma, JSON-LD de pessoa e de projeto), `app/sitemap.ts`, `app/robots.ts`, imagens de compartilhamento em `opengraph-image.tsx` de cada idioma/projeto (desenho em `lib/og-image.tsx`). Em produção, `NEXT_PUBLIC_SITE_URL` precisa apontar para o domínio final.
 - Para testar sem o painel: `npm run dev` (porta 3000). Prints/testes de navegador foram feitos com Edge headless via CDP (script de rascunho, fora do repo).
 
 ## Reestruturação da seção de projetos (feita em 02/10/2026)

@@ -1,28 +1,28 @@
 import type { Metadata } from 'next';
 import '@/app/folio.css';
 import { Home } from '@/components/home';
-import { getPublishedContent } from '@/lib/content-server';
 import { resolveToolIcons } from '@/lib/tool-icons';
 import { locales, localeLabels, localePath, type Locale } from '@/lib/locales';
+import { homeJsonLd, jsonLdHtml, publishedContent, seoCopy } from '@/lib/seo';
 
-const descriptions: Record<Locale, { title: string; description: string }> = {
-  pt: { title: 'Cyber / FullStack — Portfólio', description: 'Desenvolvimento full stack e cibersegurança. Interfaces, sistemas e segurança por design.' },
-  en: { title: 'Cyber / FullStack — Portfolio', description: 'Full stack development and cybersecurity. Interfaces, systems and security by design.' },
-  es: { title: 'Cyber / FullStack — Portafolio', description: 'Desarrollo full stack y ciberseguridad. Interfaces, sistemas y seguridad por diseño.' },
-};
-
-export function siteMetadata(locale: Locale): Metadata {
+export async function siteMetadata(locale: Locale): Promise<Metadata> {
+  const { profile } = await publishedContent(locale);
+  const { role, description } = seoCopy(locale);
+  const text = { title: `${profile.name} — ${role}`, description: description(profile.name) };
   return {
-    ...descriptions[locale],
+    ...text,
     alternates: {
       canonical: localePath(locale),
       languages: { ...Object.fromEntries(locales.map(code => [localeLabels[code].html, localePath(code)])), 'x-default': '/' },
     },
-    openGraph: { ...descriptions[locale], locale: localeLabels[locale].og, type: 'website' },
+    openGraph: { ...text, url: localePath(locale), siteName: profile.name, locale: localeLabels[locale].og, alternateLocale: locales.filter(code => code !== locale).map(code => localeLabels[code].og), type: 'profile' },
   };
 }
 
 export async function SitePage({ locale }: { locale: Locale }) {
-  const content = await getPublishedContent(locale);
-  return <Home content={content} locale={locale} toolIcons={resolveToolIcons(content.toolkit)}/>;
+  const content = await publishedContent(locale);
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(homeJsonLd(content, locale))}/>
+    <Home content={content} locale={locale} toolIcons={resolveToolIcons(content.toolkit)}/>
+  </>;
 }

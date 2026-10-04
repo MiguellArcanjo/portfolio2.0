@@ -6,7 +6,7 @@ import { translateContent } from './content-translate';
 import { contentRow, defaultLocale, type Locale } from './locales';
 import { isLocale } from './locale-detect';
 import { createClient } from './supabase/client';
-import { revalidateSite } from '@/app/admin/actions';
+import { revalidateSite } from '@/app/(pt)/admin/actions';
 
 // Content lives in the Supabase table `site_content`: one row per language ('main' = Portuguese, 'en', 'es').
 // Reads are public; writes need a logged-in session (RLS). After saving, the public pages are regenerated.

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { cache, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import '@/app/folio.css';
-import { getPublishedContent } from '@/lib/content-server';
+import { jsonLdHtml, projectJsonLd, publishedContent } from '@/lib/seo';
 import { localePath, locales, localeLabels, type Locale } from '@/lib/locales';
 import { projectPath } from '@/lib/project-path';
 import { ProjectCover } from './project-cover';
@@ -16,7 +16,7 @@ function CaseSection({ label, children, className = '' }: { label: string; child
   return <section className={`case-section ${className}`}><p className="case-label">/{label}</p><div className="case-content">{children}</div></section>;
 }
 
-const contentFor = cache(getPublishedContent);
+const contentFor = publishedContent;
 const labels = {
   pt: { back: 'Todos os projetos', about: 'Sobre o projeto', tech: 'Tecnologias', live: 'Ver projeto', repo: 'Código no GitHub', next: 'Próximo projeto', contact: 'Contato', category: 'Categoria', type: 'Tipo', links: 'Links', none: 'Projeto privado', role: 'Papel', status: 'Status', year: 'Ano', problem: 'O problema', discovery: 'Descoberta', learnings: 'O que isso me ensinou', solution: 'A solução', decisions: 'Decisões', gallery: 'Galeria', close: 'Fechar', previous: 'Foto anterior', nextPhoto: 'Próxima foto', openPhoto: 'Ampliar foto' },
   en: { back: 'All projects', about: 'About the project', tech: 'Technologies', live: 'View project', repo: 'Code on GitHub', next: 'Next project', contact: 'Contact', category: 'Category', type: 'Type', links: 'Links', none: 'Private project', role: 'Role', status: 'Status', year: 'Year', problem: 'The problem', discovery: 'Discovery', learnings: 'What it taught me', solution: 'The solution', decisions: 'Decisions', gallery: 'Gallery', close: 'Close', previous: 'Previous photo', nextPhoto: 'Next photo', openPhoto: 'Enlarge photo' },
@@ -26,9 +26,11 @@ export async function projectMetadata(locale: Locale, id: string): Promise<Metad
   const content = await contentFor(locale);
   const project = content.projects.find(item => item.id === id);
   if (!project) return { title: '404' };
-  return { title: project.title + ' — ' + content.profile.name, description: project.description,
-    alternates: { canonical: projectPath(locale,id), languages: Object.fromEntries(locales.map(code => [localeLabels[code].html,projectPath(code,id)])) },
-    openGraph: { title: project.title, description: project.description, ...(project.image ? { images: [project.image] } : {}) } };
+  const title = project.title + ' — ' + content.profile.name;
+  // The share image comes from the opengraph-image file next to each project route.
+  return { title, description: project.description,
+    alternates: { canonical: projectPath(locale,id), languages: { ...Object.fromEntries(locales.map(code => [localeLabels[code].html,projectPath(code,id)])), 'x-default': projectPath('pt', id) } },
+    openGraph: { title, description: project.description, url: projectPath(locale, id), siteName: content.profile.name, locale: localeLabels[locale].og, type: 'article' } };
 }
 export async function ProjectPage({ locale, id }: { locale: Locale; id: string }) {
   const content = await contentFor(locale);
@@ -40,6 +42,7 @@ export async function ProjectPage({ locale, id }: { locale: Locale; id: string }
   const gallery = project.gallery.filter(photo => photo.url);
   const hasCase = Boolean(problems.length || project.discovery || project.solution || project.decisions.length);
   return <div className="folio" lang={localeLabels[locale].html}>
+    <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(projectJsonLd(content, project, locale))}/>
     <header className="folio-header folio-width"><Link className="folio-brand" href={localePath(locale)}>{content.profile.initials}<span>.</span></Link><Link className="folio-inline" style={{marginLeft:'auto'}} href={localePath(locale)+'#contato'}>{t.contact}<ArrowUpRight size={15}/></Link><nav className="lang-switch" aria-label="Language">{locales.map(code => <Link key={code} href={projectPath(code,id)} hrefLang={localeLabels[code].html} aria-current={code===locale ? 'true' : undefined}>{localeLabels[code].short}</Link>)}</nav></header>
     {/* Reading progress, driven by the page scroll where the browser supports scroll timelines. */}
     <div className="case-progress" aria-hidden="true"/>
