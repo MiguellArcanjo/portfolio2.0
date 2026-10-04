@@ -47,7 +47,7 @@ function Site({ content }: { content: SiteContent }) {
     document.querySelectorAll('.folio-section h2').forEach(title => observer.observe(title));
     return () => observer.disconnect();
   }, []);
-  const navItems = [[t.nav.projects, 'projetos'], [t.nav.stack, 'stack'], [t.nav.about, 'sobre'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
+  const navItems = [[t.nav.stack, 'stack'], [t.nav.projects, 'projetos'], [t.nav.about, 'sobre'], ...(experience.items.length ? [[t.nav.experience, 'experiencia']] : [])];
   return <div className="folio">
     <a className="skip-link" href="#main">{t.skip}</a>
     <FolioHeader profile={profile} nav={navItems as [string, string][]} contactLabel={t.contact} languages={<LanguageSwitch/>} mobileLanguages={<LanguageSwitch className="in-overlay"/>}/>
@@ -61,11 +61,11 @@ function Site({ content }: { content: SiteContent }) {
           <div className="hero-side"><span>{profile.status}</span><div>{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={17}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ArrowUpRight size={17}/></a>}</div></div>
         </div>
       </section>
+      <FolioStack toolkit={toolkit} label={t.nav.stack}/>
       <section id="projetos" className="folio-section folio-work">
-        <div className="folio-section-head"><div><p className="folio-role">01 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
+        <div className="folio-section-head"><div><p className="folio-role">02 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
         <ProjectAccordion projects={projects} locale={locale}/>
       </section>
-      <FolioStack toolkit={toolkit} label={t.nav.stack}/>
       <FolioAbout about={about} label={t.nav.about}/>
       <FolioExperience experience={experience} label={t.nav.experience}/>
       <FolioContact content={content} label={t.contact}/>
