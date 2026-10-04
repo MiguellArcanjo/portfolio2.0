@@ -14,7 +14,7 @@ export function FolioStack({ toolkit, label }: { toolkit: SiteContent['toolkit']
   if (!area) return null;
 
   return <section id="stack" className="folio-section folio-stack-section">
-    <div className="folio-section-head"><div><p className="folio-role">03 / {label}</p><h2>{toolkit.title} {toolkit.accent && <span>{toolkit.accent}</span>}</h2></div>{toolkit.text && <div className="stack-intro"><RichText text={toolkit.text}/></div>}</div>
+    <div className="folio-section-head"><div><p className="folio-role">02 / {label}</p><h2>{toolkit.title} {toolkit.accent && <span>{toolkit.accent}</span>}</h2></div>{toolkit.text && <div className="stack-intro"><RichText text={toolkit.text}/></div>}</div>
     {allTools.length > 0 && <div className="stack-marquee" aria-hidden="true">
       {[0, 1].map(copy => <div key={copy} className="stack-marquee-track">{allTools.map(tool => <span key={tool}>{tool}</span>)}</div>)}
     </div>}

@@ -45,7 +45,7 @@ export function FolioAbout({ about, label }: { about: SiteContent['about']; labe
   return <section id="sobre" className="folio-section folio-about">
     <div className="about-top">
       <div className="about-head">
-        <p className="folio-role">02 / {label}</p>
+        <p className="folio-role">03 / {label}</p>
         <h2>{about.title} <span>{about.accent}</span></h2>
       </div>
       <div className="about-body">
