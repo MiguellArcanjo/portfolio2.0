@@ -11,11 +11,12 @@ import { FolioContact, FolioFooter } from './folio-contact';
 import { FolioHeader } from './folio-header';
 import { ProjectAccordion } from './project-accordion';
 import type { SiteContent } from '@/lib/content';
+import type { ToolIcons } from '@/lib/tool-icons';
 import { I18nProvider, useI18n, locales, localeLabels, localePath, type Locale } from '@/lib/i18n';
 import { LOCALE_COOKIE } from '@/lib/locale-detect';
 
-export function Home({ content, locale }: { content: SiteContent; locale: Locale }) {
-  return <I18nProvider locale={locale}><Site content={content}/></I18nProvider>;
+export function Home({ content, locale, toolIcons }: { content: SiteContent; locale: Locale; toolIcons: ToolIcons }) {
+  return <I18nProvider locale={locale}><Site content={content} toolIcons={toolIcons}/></I18nProvider>;
 }
 // Keeps the reader on the same section when switching language.
 function LanguageSwitch({ className = '', label }: { className?: string; label?: string }) {
@@ -31,7 +32,7 @@ function LanguageSwitch({ className = '', label }: { className?: string; label?:
   </nav>;
 }
 
-function Site({ content }: { content: SiteContent }) {
+function Site({ content, toolIcons }: { content: SiteContent; toolIcons: ToolIcons }) {
   const { locale, t } = useI18n();
   const { profile, about, toolkit, experience } = content;
   const [filter, setFilter] = useState('');
@@ -61,7 +62,7 @@ function Site({ content }: { content: SiteContent }) {
           <div className="hero-side"><span>{profile.status}</span><div>{profile.github && <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<ArrowUpRight size={17}/></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ArrowUpRight size={17}/></a>}</div></div>
         </div>
       </section>
-      <FolioStack toolkit={toolkit} label={t.nav.stack}/>
+      <FolioStack toolkit={toolkit} icons={toolIcons} label={t.nav.stack}/>
       <section id="projetos" className="folio-section folio-work">
         <div className="folio-section-head"><div><p className="folio-role">02 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
         <ProjectAccordion projects={projects} locale={locale}/>

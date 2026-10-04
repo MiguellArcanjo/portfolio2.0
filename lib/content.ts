@@ -63,7 +63,8 @@ export type Experience = {
   link: string;
 };
 
-export type Tool = { name: string; description: string; mark: string };
+// icon: simple-icons slug to override the logo found from the name (e.g. "openjdk").
+export type Tool = { name: string; description: string; mark: string; icon?: string };
 
 export type StackArea = {
   id: string;

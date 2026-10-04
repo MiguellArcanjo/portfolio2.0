@@ -254,13 +254,14 @@ export function StackEditor({ content, edit }: { content: SiteContent; edit: Edi
         <Field label="Subtítulo" value={area.subtitle} onChange={set('subtitle')}/>
         <TextArea label="Descrição" rows={3} value={area.description} onChange={set('description')}/>
       </Panel>
-      <Panel title="Ferramentas" description="As 4 primeiras aparecem como blocos na camada 3D." actions={<button className="adm-btn small" onClick={() => edit(draft => { draft.toolkit.areas[index].tools.push({ name: '', description: '', mark: '' }); })}><Plus size={14}/> Ferramenta</button>}>
+      <Panel title="Ferramentas" description="O logo vem do nome (simple-icons.org). Se não aparecer, preencha “Logo” com o slug do site; sem logo, mostra a sigla." actions={<button className="adm-btn small" onClick={() => edit(draft => { draft.toolkit.areas[index].tools.push({ name: '', description: '', mark: '' }); })}><Plus size={14}/> Ferramenta</button>}>
         <div className="adm-rows">{area.tools.map((tool, toolIndex) => <div className="adm-row tool" key={toolIndex}>
           <span className="adm-mark" style={{ color: area.color }}>{tool.mark || '—'}</span>
           <div className="adm-row-fields three">
             <Field label="Nome" value={tool.name} onChange={value => edit(draft => { draft.toolkit.areas[index].tools[toolIndex].name = value; })}/>
             <Field label="Descrição" value={tool.description} onChange={value => edit(draft => { draft.toolkit.areas[index].tools[toolIndex].description = value; })}/>
             <Field label="Sigla" value={tool.mark} mono onChange={value => edit(draft => { draft.toolkit.areas[index].tools[toolIndex].mark = value.slice(0, 4); })}/>
+            <Field label="Logo (opcional)" value={tool.icon ?? ''} mono placeholder="ex.: openjdk" onChange={value => edit(draft => { draft.toolkit.areas[index].tools[toolIndex].icon = value.trim(); })}/>
           </div>
           <RowActions index={toolIndex} total={area.tools.length} label={tool.name || 'ferramenta'} onMove={(from, to) => edit(draft => { draft.toolkit.areas[index].tools = move(draft.toolkit.areas[index].tools, from, to); })} onRemove={() => edit(draft => { draft.toolkit.areas[index].tools.splice(toolIndex, 1); })}/>
         </div>)}</div>

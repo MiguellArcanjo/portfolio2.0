@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '@/app/folio.css';
 import { Home } from '@/components/home';
 import { getPublishedContent } from '@/lib/content-server';
+import { resolveToolIcons } from '@/lib/tool-icons';
 import { locales, localeLabels, localePath, type Locale } from '@/lib/locales';
 
 const descriptions: Record<Locale, { title: string; description: string }> = {
@@ -23,5 +24,5 @@ export function siteMetadata(locale: Locale): Metadata {
 
 export async function SitePage({ locale }: { locale: Locale }) {
   const content = await getPublishedContent(locale);
-  return <Home content={content} locale={locale}/>;
+  return <Home content={content} locale={locale} toolIcons={resolveToolIcons(content.toolkit)}/>;
 }
