@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'monthly' as const,
     priority: .7,
     alternates: { languages: languages(code => projectPath(code, project.id)) },
-    ...(project.image ? { images: [project.image] } : {}),
+    ...(project.image ? { images: [absolute(project.image)] } : {}),
   })));
 
   return [...homes, ...projects];

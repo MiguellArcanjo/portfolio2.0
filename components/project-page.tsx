@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { CSSProperties } from 'react';
+import { Fragment, type CSSProperties } from 'react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import '@/app/folio.css';
 import { jsonLdHtml, projectJsonLd, publishedContent } from '@/lib/seo';
@@ -50,7 +50,8 @@ export async function ProjectPage({ locale, id }: { locale: Locale; id: string }
       <Link className="case-back" href={localePath(locale)+'#projetos'}><ArrowLeft size={16}/>{t.back}</Link>
       <section className="case-heading">
         <p className="folio-role">{String(index + 1).padStart(2, '0')} / {String(content.projects.length).padStart(2, '0')} · {project.category}</p>
-        <h1 aria-label={project.title}>{[...project.title].map((char, i) => char === ' ' ? ' ' : <span key={i} aria-hidden="true" style={{ '--i': i } as CSSProperties}>{char}</span>)}</h1>
+        {/* Letters animate one by one; each word stays whole so long titles only break between words. */}
+        <h1 aria-label={project.title} data-long={project.title.length > 22 || undefined}>{project.title.split(' ').map((word, w, words) => { const start = words.slice(0, w).join(' ').length + (w ? 1 : 0); return <Fragment key={w}>{w > 0 && ' '}<span className="case-word" aria-hidden="true">{[...word].map((char, i) => <span key={i} style={{ '--i': start + i } as CSSProperties}>{char}</span>)}</span></Fragment>; })}</h1>
         <div className="case-lede">
           <p className="case-summary">{project.description}</p>
           <dl className="case-facts">

@@ -166,7 +166,7 @@ export function ProjectsEditor({ content, edit }: { content: SiteContent; edit: 
   </div>;
 }
 
-const sceneLabels: Record<ProjectScene, string> = { auto: 'Capa em movimento', checklist: 'Checklist sendo concluído', call: 'Chamada de voz e tela', chat: 'Mensagem no WhatsApp', gallery: 'Galeria de fotos', rental: 'Aluguel e manutenção (telas do app)' };
+const sceneLabels: Record<ProjectScene, string> = { auto: 'Capa em movimento', checklist: 'Checklist sendo concluído', call: 'Chamada de voz e tela', chat: 'Mensagem no WhatsApp', gallery: 'Galeria de fotos', rental: 'Aluguel e manutenção (telas do app)', audit: 'Auditoria: achados sendo corrigidos' };
 
 // The case study shown on the project's own page; every block is optional and hides itself when empty.
 function CaseStudyEditor({ project, set }: { project: Project; set: <K extends keyof Project>(key: K) => (value: Project[K]) => void }) {

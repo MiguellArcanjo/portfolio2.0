@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { Wrench, CheckCheck } from 'lucide-react';
 import type { Project } from '@/lib/content';
+import type { Locale } from '@/lib/locales';
 
 // Small animated scenes that tell what each project does. Pure CSS loops (app/folio.css, "sc-" classes),
 // mounted only while the project is open in the list. Texts are illustrative, in the project's own language.
@@ -119,17 +120,46 @@ function Rental({ project }: { project: Project }) {
   </div>;
 }
 
+// Security audit: a shield being scanned beside the real report and test run; findings flip to fixed.
+const auditWords = {
+  pt: { line: <>Achar, corrigir<br/>e <em>provar</em>.</>, levels: ['Alta', 'Média', 'Média'], open: 'Aberto', fixed: 'Corrigido', tests: 'testes passando' },
+  en: { line: <>Find it, fix it,<br/><em>prove</em> it.</>, levels: ['High', 'Medium', 'Medium'], open: 'Open', fixed: 'Fixed', tests: 'tests passing' },
+  es: { line: <>Encontrar, corregir<br/>y <em>probar</em>.</>, levels: ['Alta', 'Media', 'Media'], open: 'Abierto', fixed: 'Corregido', tests: 'pruebas pasando' },
+};
+function Audit({ project, locale }: { project: Project; locale: Locale }) {
+  const w = auditWords[locale];
+  return <div className="sc sc-show sc-audit">
+    <div className="sc-brand">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <path className="sc-shield" d="M100 14 48 34v38c0 34 22 60 52 74 30-14 52-40 52-74V34Z"/>
+        <clipPath id="sc-shield-clip"><path d="M100 14 48 34v38c0 34 22 60 52 74 30-14 52-40 52-74V34Z"/></clipPath>
+        <g clipPath="url(#sc-shield-clip)"><rect className="sc-scan" x="40" y="0" width="120" height="16"/></g>
+        {[0, 1, 2].map(i => <g key={i} className="sc-find" style={v({ '--i': i })}><circle cx={78 + i * 22} cy={78 + (i % 2) * 18} r="8"/><path d={`M${74 + i * 22} ${78 + (i % 2) * 18}l3 3 6-6`}/></g>)}
+      </svg>
+      <p>{w.line}</p>
+    </div>
+    <div className="sc-shot sc-browser sc-audit-report"><div className="sc-bar"><i/><i/><i/></div><img src={shot(project, 0, '/galeria/auditoria-apart/01.webp')} alt=""/></div>
+    <div className="sc-shot sc-audit-term"><img src={shot(project, 2, '/galeria/auditoria-apart/03.webp')} alt=""/></div>
+    <div className="sc-float sc-findings">{w.levels.map((level, i) => <div key={i} className="sc-finding" style={v({ '--i': i })}>
+      <span className={`sc-sev sc-sev-${i ? 'mid' : 'high'}`}>{level}</span>
+      <span className="sc-state"><i>{w.open}</i><i><CheckCheck size={11}/> {w.fixed}</i></span>
+    </div>)}</div>
+    <div className="sc-float sc-tests"><b>14/14</b><small>{w.tests}</small></div>
+  </div>;
+}
+
 function Auto({ project }: { project: Project }) {
   return <div className="sc sc-auto">{project.image ? <img src={project.image} alt=""/> : <strong>{project.title}</strong>}<span className="sc-shine"/></div>;
 }
 
-export function ProjectScene({ project }: { project: Project }) {
+export function ProjectScene({ project, locale }: { project: Project; locale: Locale }) {
   switch (project.scene) {
     case 'checklist': return <Checklist project={project}/>;
     case 'call': return <Call project={project}/>;
     case 'chat': return <Chat project={project}/>;
     case 'gallery': return <Gallery project={project}/>;
     case 'rental': return <Rental project={project}/>;
+    case 'audit': return <Audit project={project} locale={locale}/>;
     default: return <Auto project={project}/>;
   }
 }

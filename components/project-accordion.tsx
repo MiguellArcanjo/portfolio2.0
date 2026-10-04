@@ -54,7 +54,7 @@ export function ProjectAccordion({ projects, locale }: { projects: Project[]; lo
               {project.tags.length > 0 && <ul className="pj-tags">{project.tags.slice(0, 6).map(tag => <li key={tag}>{tag}</li>)}{project.tags.length > 6 && <li>+{project.tags.length - 6}</li>}</ul>}
               <Link className="pj-open" href={href}>{w.open}<ArrowUpRight size={16}/></Link>
             </div>
-            <div className="pj-scene" aria-hidden="true">{open && sceneReady && <ProjectScene project={project}/>}</div>
+            <div className="pj-scene" aria-hidden="true">{open && sceneReady && <ProjectScene project={project} locale={locale}/>}</div>
           </div>
         </div>
       </li>;

@@ -76,7 +76,7 @@ export function projectJsonLd(content: SiteContent, project: Project, locale: Lo
     description: project.description,
     url: absolute(projectPath(locale, project.id)),
     inLanguage: localeLabels[locale].html,
-    ...(project.image ? { image: project.image } : {}),
+    ...(project.image ? { image: absolute(project.image) } : {}),
     ...(project.year ? { dateCreated: project.year } : {}),
     ...(project.tags.length ? { keywords: project.tags.join(', ') } : {}),
     ...(project.live ? { sameAs: [project.live] } : {}),
