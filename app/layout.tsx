@@ -17,5 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pt-BR" className={`${dmSans.variable} ${manrope.variable} ${plexMono.variable} ${serif.variable}`}><body>{children}</body></html>;
+  // Browser extensions (e.g. Google Tag Assistant) add attributes to <html> before hydration;
+  // this silences that mismatch on <html> only, children are still checked.
+  return <html lang="pt-BR" suppressHydrationWarning className={`${dmSans.variable} ${manrope.variable} ${plexMono.variable} ${serif.variable}`}><body>{children}</body></html>;
 }
