@@ -35,5 +35,7 @@ Pedido do dono, com referências (lista de serviços em acordeão e o case "Work
 
 ### Também pendente (pedidos anteriores)
 
-- **Auditoria de segurança do Apart** como projeto do portfólio (o dono pediu para fazer depois do Domu). Projeto em `C:\Users\conta\Desktop\Apart` (Electron + Appwrite + LiveKit); leia `Apart/AGENTS.md`. Não ler `.env`.
+- **Auditoria de segurança do Apart** como projeto do portfólio. Projeto em `C:\Users\conta\Desktop\Apart` (Electron + Appwrite + LiveKit); leia `Apart/AGENTS.md`. Não ler `.env`.
+  - Feito (04/10/2026): relatório `Apart/docs/auditoria-seguranca.md` (8 achados: 1 alto, 3 médios, 3 baixos, 1 informativo) e correções na branch `fix/security-audit` do Apart (commit `a4ec8ab`, já no GitHub; testes em `scripts/test-security.mjs`). A versão em uso é a 0.7.2, mas o código dela não está no repositório (que para na 0.7.0): o dono precisa juntar a branch com a 0.7.2, rodar `npm run setup-db` e publicar.
+  - Falta: o projeto no portfólio (textos PT/EN/ES com os campos de estudo de caso, cena, galeria e capa), gerado a partir das linhas publicadas mais recentes. Não publicar detalhes de como explorar cada falha; contar o processo (escopo, achados por gravidade, correções, testes).
 - Arquivos de importação já entregues ao dono: `traducoes/*-com-domu.json` (Domu) e capas em `imagens/cover-domu-*.png`. O Domu é feito em dupla com Marcos Lima; o dono ainda vai confirmar a divisão de papéis descrita no texto.
