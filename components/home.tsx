@@ -5,7 +5,7 @@ import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import { RichText } from './rich-text';
 import { DrawnName } from './drawn-name';
 import { FolioAbout } from './folio-about';
-import { FolioStack } from './folio-stack';
+import { FolioStack, FolioStackTable } from './folio-stack';
 import { FolioExperience } from './folio-experience';
 import { FolioContact, FolioFooter } from './folio-contact';
 import { FolioHeader } from './folio-header';
@@ -63,6 +63,8 @@ function Site({ content, toolIcons }: { content: SiteContent; toolIcons: ToolIco
         </div>
       </section>
       <FolioStack toolkit={toolkit} icons={toolIcons} label={t.nav.stack}/>
+      {/* Temporary: second layout to compare with the one above; remove once the owner picks one. */}
+      <FolioStackTable toolkit={toolkit} icons={toolIcons} label={t.nav.stack}/>
       <section id="projetos" className="folio-section folio-work">
         <div className="folio-section-head"><div><p className="folio-role">02 / {t.nav.projects}</p><h2>{content.projectsSection.title}<br/><span>{content.projectsSection.accent}</span></h2></div>{categories.length > 1 && <div className="folio-filters" aria-label={t.filterProjects}>{['', ...categories].map(category => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category || t.all}<sup>{String(content.projects.filter(project => !category || project.category === category).length).padStart(2,'0')}</sup></button>)}</div>}</div>
         <ProjectAccordion projects={projects} locale={locale}/>
