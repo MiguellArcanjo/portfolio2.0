@@ -463,6 +463,33 @@ a:hover>.roll>span,a:hover>.roll:after,a:focus-visible>.roll>span,a:focus-visibl
 @keyframes sc-fix-a{0%,18%{opacity:1}24%,88%{opacity:0}94%,100%{opacity:1}}
 @keyframes sc-fix-b{0%,18%{opacity:0}24%,88%{opacity:1}94%,100%{opacity:0}}
 @keyframes sc-tests{0%,48%{color:#7d7994}56%,90%{color:#3fd07f}100%{color:#7d7994}}
+/* Aos Olhos (light, like the product) */
+.sc-aos{--bg:#f1ebe3;--brand:radial-gradient(80% 60% at 50% 40%,#fbf8f3,#ece3d7);background-image:linear-gradient(#2b26220d 1px,transparent 1px),linear-gradient(90deg,#2b26220d 1px,transparent 1px)}
+.sc-aos .sc-brand{box-shadow:0 2em 3em -1.5em #6b55424d,0 0 0 1px #2b26221a}
+.sc-aos .sc-brand p{color:#2b2622;font-family:var(--font-serif),serif;font-weight:400;font-size:1.9em;letter-spacing:0}.sc-aos .sc-brand em{color:#8a6a52;font-style:italic}
+.sc-eye{fill:#fff;stroke:#2b2622;stroke-width:3}
+.sc-iris{transform-origin:100px 82px;animation:sc-iris 9s ease-in-out infinite}
+.sc-iris circle:first-child{fill:#8a6a52}.sc-iris path{fill:#a8876c;stroke:#8a6a52;stroke-width:1}.sc-pupil{fill:#2b2622}
+.sc-heart{fill:#e2557b;opacity:0;transform-box:fill-box;transform-origin:center;animation:sc-heart 9s infinite;animation-delay:calc(var(--i) * .9s)}
+.sc-aos-site{left:44%;top:7%;width:53%;box-shadow:0 2em 3.5em -1.2em #6b554266,0 0 0 1px #2b26221a;animation:sc-float 7s ease-in-out infinite}
+.sc-aos .sc-browser .sc-bar{background:#ece6dd}.sc-aos .sc-browser .sc-bar i{background:#cfc5b8}
+.sc-aos-phone{left:80%;top:30%;width:16%;z-index:2;background:#1d1a17;animation:sc-float 6s 1s ease-in-out infinite}
+.sc-aos .sc-float{background:#fffdf9;border-color:#2b26221f;color:#2b2622;box-shadow:0 1.4em 2.4em -1em #6b554266}
+.sc-aos .sc-float small{color:#8b8077}
+.sc-aos .sc-aos-count{left:37%;bottom:9%;display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:.15em .4em;min-width:11em;animation:sc-float 5s .4s ease-in-out infinite}
+.sc-aos-num{position:relative;width:1.6em;height:1.3em;font-weight:800;font-size:1.1em}
+.sc-aos-num i{position:absolute;inset:0;font-style:normal;opacity:0;animation:sc-aos-num 9s infinite}
+.sc-aos-num i:nth-child(2){animation-delay:3s}.sc-aos-num i:nth-child(3){animation-delay:6s}
+.sc-aos-bar{grid-column:1/-1;height:.35em;border-radius:99px;background:#efe7dc;overflow:hidden}
+.sc-aos-bar i{display:block;height:100%;border-radius:inherit;background:#8a6a52;transform-origin:left;animation:sc-aos-bar 9s infinite}
+.sc-aos .sc-aos-done{left:58%;bottom:6%;animation:sc-aos-done 9s infinite}
+.sc-aos-check{width:2em;height:2em;flex:none;display:grid;place-items:center;border-radius:50%;background:#e7f4ec;color:#23874f}
+@keyframes sc-iris{0%,100%{transform:rotate(0) translateX(0)}30%{transform:rotate(30deg) translateX(-8px)}65%{transform:rotate(-20deg) translateX(8px)}}
+@keyframes sc-heart{0%,8%{opacity:0;transform:scale(.4)}14%{opacity:1;transform:scale(1.2)}20%,80%{opacity:1;transform:scale(1)}90%,100%{opacity:0;transform:scale(.6)}}
+@keyframes sc-aos-num{0%{opacity:0;transform:translateY(.4em)}3%,30%{opacity:1;transform:none}34%,100%{opacity:0;transform:translateY(-.4em)}}
+@keyframes sc-aos-bar{0%,30%{transform:scaleX(.35)}36%,63%{transform:scaleX(.7)}69%,96%{transform:scaleX(1)}100%{transform:scaleX(.35)}}
+@keyframes sc-aos-done{0%,66%{opacity:0;transform:translateY(.8em)}72%,94%{opacity:1;transform:none}100%{opacity:0}}
+
 
 
 /* Flaviano */

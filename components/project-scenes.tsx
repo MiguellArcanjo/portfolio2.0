@@ -148,6 +148,30 @@ function Audit({ project, locale }: { project: Project; locale: Locale }) {
   </div>;
 }
 
+// Aos Olhos: the client's selection screen and phone; hearts fill the package, then the photographer gets the list.
+const proofingWords = {
+  pt: { line: <>Escolher fotos<br/>com <em>carinho</em>.</>, of: 'de 20 fotos', done: 'Seleção recebida', list: 'Lista pronta para o Lightroom' },
+  en: { line: <>Picking photos,<br/>with <em>care</em>.</>, of: 'of 20 photos', done: 'Selection received', list: 'List ready for Lightroom' },
+  es: { line: <>Elegir fotos<br/>con <em>cariño</em>.</>, of: 'de 20 fotos', done: 'Selección recibida', list: 'Lista lista para Lightroom' },
+};
+function Proofing({ project, locale }: { project: Project; locale: Locale }) {
+  const w = proofingWords[locale];
+  return <div className="sc sc-show sc-aos">
+    <div className="sc-brand">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <path className="sc-eye" d="M22 82c22-34 50-50 78-50s56 16 78 50c-22 34-50 50-78 50S44 116 22 82Z"/>
+        <g className="sc-iris"><circle cx="100" cy="82" r="30"/>{[0, 1, 2, 3, 4, 5].map(i => <path key={i} d="M100 82 100 58A24 24 0 0 1 121 70Z" transform={`rotate(${i * 60} 100 82)`}/>)}<circle className="sc-pupil" cx="100" cy="82" r="9"/></g>
+        {[0, 1, 2].map(i => <g key={i} transform={`translate(${[150, 30, 160][i]} ${[24, 34, 126][i]}) scale(1.5)`}><path className="sc-heart" style={v({ '--i': i })} d="M0 4a4 4 0 0 1 7-2.6A4 4 0 0 1 14 4c0 5-7 9-7 9S0 9 0 4Z"/></g>)}
+      </svg>
+      <p>{w.line}</p>
+    </div>
+    <div className="sc-shot sc-browser sc-aos-site"><div className="sc-bar"><i/><i/><i/></div><img src={shot(project, 0, '/galeria/aos-olhos/01.webp')} alt=""/></div>
+    <div className="sc-device sc-aos-phone"><div className="sc-screen"><img src={shot(project, 2, '/galeria/aos-olhos/03.webp')} alt=""/></div></div>
+    <div className="sc-float sc-aos-count"><span className="sc-aos-num"><i>7</i><i>14</i><i>20</i></span><small>{w.of}</small><span className="sc-aos-bar"><i/></span></div>
+    <div className="sc-float sc-aos-done"><span className="sc-aos-check"><CheckCheck size={14}/></span><div><b>{w.done}</b><small>{w.list}</small></div></div>
+  </div>;
+}
+
 function Auto({ project }: { project: Project }) {
   return <div className="sc sc-auto">{project.image ? <img src={project.image} alt=""/> : <strong>{project.title}</strong>}<span className="sc-shine"/></div>;
 }
@@ -160,6 +184,7 @@ export function ProjectScene({ project, locale }: { project: Project; locale: Lo
     case 'gallery': return <Gallery project={project}/>;
     case 'rental': return <Rental project={project}/>;
     case 'audit': return <Audit project={project} locale={locale}/>;
+    case 'proofing': return <Proofing project={project} locale={locale}/>;
     default: return <Auto project={project}/>;
   }
 }

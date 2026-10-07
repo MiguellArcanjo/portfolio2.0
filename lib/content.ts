@@ -8,7 +8,7 @@ export type PreviewKind = (typeof previewKinds)[number];
 export type AreaIcon = (typeof areaIcons)[number];
 
 /** Animated scene shown when a project opens in the list. "auto" animates the cover image. */
-export const projectScenes = ['auto', 'checklist', 'call', 'chat', 'gallery', 'rental', 'audit'] as const;
+export const projectScenes = ['auto', 'checklist', 'call', 'chat', 'gallery', 'rental', 'audit', 'proofing'] as const;
 export type ProjectScene = (typeof projectScenes)[number];
 export type ProjectMetric = { value: string; label: string };
 export type ProjectDecision = { title: string; text: string };
